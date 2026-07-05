@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Agri360 — Farmer Digital Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green-50:#f0fdf4;--green-100:#dcfce7;--green-200:#bbf7d0;--green-400:#4ade80;
+  --green-500:#22c55e;--green-600:#16a34a;--green-700:#15803d;--green-800:#166534;--green-900:#14532d;
+  --amber-50:#fffbeb;--amber-100:#fef3c7;--amber-500:#f59e0b;--amber-600:#d97706;--amber-700:#b45309;
+  --red-50:#fef2f2;--red-100:#fee2e2;--red-500:#ef4444;--red-600:#dc2626;--red-700:#b91c1c;
+  --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-500:#3b82f6;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+  --radius:16px;--radius-sm:12px;--radius-lg:24px;
+}
+html{font-family:'Source Sans 3',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:16px}
+body{background:linear-gradient(135deg,var(--green-50),#fff,#fffbf0);min-height:100dvh;color:var(--gray-900)}
+h1,h2,h3,h4,h5,h6,.font-heading{font-family:'Lexend',system-ui,sans-serif}
+
+/* Header */
+.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.header-brand{display:flex;align-items:center;gap:8px}
+.header-icon{width:32px;height:32px;border-radius:12px;background:var(--green-700);display:flex;align-items:center;justify-content:center}
+.header-icon svg{width:18px;height:18px;color:#fff}
+.header-title{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--green-900)}
+.header-tagline{font-size:11px;color:var(--gray-500);margin-left:6px;display:none}
+@media(min-width:480px){.header-tagline{display:inline}}
+.lang-toggle{display:flex;background:var(--gray-100);border-radius:12px;padding:2px;gap:2px}
+.lang-btn{padding:6px 14px;border-radius:10px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--gray-600)}
+.lang-btn.active{background:#dc2626;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+
+/* Cards */
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.main{max-width:480px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+@media(min-width:1024px){
+  .main{max-width:1200px;display:grid;grid-template-columns:1fr 1.4fr;gap:20px;padding:24px}
+  .left-col{display:flex;flex-direction:column;gap:16px}
+}
+
+/* Section headers */
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.section-icon{width:28px;height:28px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-icon svg{width:16px;height:16px;color:var(--green-700)}
+.section-title{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--gray-800)}
+
+/* Farmer Details Grid */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-item{display:flex;align-items:flex-start;gap:8px;padding:10px;border-radius:var(--radius-sm);background:var(--gray-50)}
+.detail-item.full{grid-column:1/-1}
+.detail-item svg{width:14px;height:14px;color:var(--green-600);flex-shrink:0;margin-top:2px}
+.detail-label{font-size:11px;color:var(--gray-500);line-height:1.2}
+.detail-value{font-size:14px;font-weight:600;color:var(--gray-900);line-height:1.3}
+.profile-group{margin-bottom:14px}
+.profile-group:last-child{margin-bottom:0}
+.profile-subhead{font-size:11px;font-weight:700;color:var(--green-700);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--gray-100)}
+.mitra-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,var(--green-700),var(--green-800));border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px}
+.mitra-banner .mitra-label{font-size:10px;color:var(--green-100);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.mitra-banner .mitra-value{font-family:'Lexend';font-weight:700;font-size:18px;color:#fff;margin-top:2px}
+.mitra-banner svg{width:26px;height:26px;color:var(--green-200)}
+
+/* Farm Status */
+.status-banner{border-radius:var(--radius);border:2px solid;padding:14px;display:flex;align-items:center;gap:12px}
+.status-banner.good{background:var(--green-50);border-color:var(--green-200)}
+.status-banner.needs_attention{background:var(--amber-50);border-color:#fde68a}
+.status-banner.urgent{background:var(--red-50);border-color:#fecaca}
+.status-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.status-icon.good{background:var(--green-100)}
+.status-icon.good svg{color:var(--green-600);width:28px;height:28px}
+.status-icon.needs_attention{background:var(--amber-100)}
+.status-icon.needs_attention svg{color:var(--amber-600);width:28px;height:28px}
+.status-icon.urgent{background:var(--red-100)}
+.status-icon.urgent svg{color:var(--red-600);width:28px;height:28px}
+.status-label{font-family:'Lexend';font-weight:700;font-size:18px}
+.status-label.good{color:var(--green-600)}
+.status-label.needs_attention{color:var(--amber-700)}
+.status-label.urgent{color:var(--red-700)}
+.status-desc{font-size:13px;color:var(--gray-700)}
+
+/* Location + refresh bar */
+.location-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--green-50);border:1px solid var(--green-100)}
+.location-bar .loc-left{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--green-800)}
+.location-bar .loc-left svg{width:14px;height:14px;color:var(--green-600);flex-shrink:0}
+.location-bar .loc-right{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray-500)}
+.refresh-btn{display:flex;align-items:center;gap:4px;background:#fff;border:1px solid var(--green-200);color:var(--green-700);font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;cursor:pointer;transition:background .15s}
+.refresh-btn:hover{background:var(--green-100)}
+.refresh-btn svg{width:12px;height:12px}
+.refresh-btn.spinning svg{animation:spin .6s linear}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.status-note{margin-top:10px;padding:10px;border-radius:var(--radius-sm);background:var(--gray-50);border:1px solid var(--gray-100)}
+.status-note p{font-size:12px;color:var(--gray-500);line-height:1.5}
+.status-guide{margin-top:12px;padding-top:10px;border-top:1px solid var(--gray-100)}
+.status-guide-title{font-size:11px;font-weight:700;color:var(--gray-600);margin-bottom:8px}
+.guide-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.guide-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.guide-label{font-size:12px;font-weight:600;color:var(--gray-700)}
+.guide-desc{font-size:11px;color:var(--gray-500)}
+
+/* Eagle Eye 360 */
+.eagle-sub{font-size:12px;color:var(--gray-500);margin-left:36px;margin-bottom:12px}
+.eagle-map{position:relative;width:100%;max-width:380px;aspect-ratio:1;margin:0 auto}
+.eagle-circle{position:absolute;inset:14%;border-radius:50%;border:2px dashed var(--gray-200)}
+.eagle-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--green-100),var(--green-50));border:2px solid var(--green-300);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:5}
+.eagle-center svg{width:22px;height:22px;color:var(--green-600)}
+.eagle-center span{font-size:8px;font-family:'Lexend';font-weight:700;color:var(--green-800);text-align:center;line-height:1.1;margin-top:2px}
+
+.cluster-btn{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;z-index:10;transition:transform .2s;-webkit-tap-highlight-color:transparent}
+.cluster-btn:active{transform:scale(1.08)}
+.cluster-box{width:56px;height:56px;border-radius:14px;background:#fff;border:2px solid var(--gray-200);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:all .2s}
+.cluster-box:hover{box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.cluster-box .num{font-family:'Lexend';font-weight:700;font-size:17px;color:var(--gray-800);line-height:1}
+.cluster-box .dir{font-size:7px;color:var(--gray-500);text-align:center;line-height:1.1;padding:0 2px}
+.cluster-status{display:flex;align-items:center;gap:3px}
+.cluster-dot{width:8px;height:8px;border-radius:50%}
+.cluster-status-text{font-size:9px;font-weight:600;color:var(--gray-600)}
+
+.cluster-btn.good .cluster-box{border-color:var(--green-200)}
+.cluster-btn.good .cluster-dot{background:var(--green-500)}
+.cluster-btn.needs_attention .cluster-box{border-color:var(--amber-500)}
+.cluster-btn.needs_attention .cluster-dot{background:var(--amber-500)}
+.cluster-btn.urgent .cluster-box{border-color:var(--red-500)}
+.cluster-btn.urgent .cluster-dot{background:var(--red-500)}
+
+/* Cluster positions */
+.cluster-btn[data-n="1"]{top:2%;left:50%;transform:translateX(-50%)}
+.cluster-btn[data-n="2"]{top:10%;right:6%}
+.cluster-btn[data-n="3"]{top:42%;right:0;transform:translateY(-50%)}
+.cluster-btn[data-n="4"]{bottom:10%;right:6%}
+.cluster-btn[data-n="5"]{bottom:2%;left:50%;transform:translateX(-50%)}
+.cluster-btn[data-n="6"]{bottom:10%;left:6%}
+.cluster-btn[data-n="7"]{top:42%;left:0;transform:translateY(-50%)}
+.cluster-btn[data-n="8"]{top:10%;left:6%}
+
+.tip-bar{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--amber-50);border:1px solid var(--amber-100);display:flex;align-items:flex-start;gap:8px}
+.tip-bar svg{width:16px;height:16px;color:var(--amber-500);flex-shrink:0;margin-top:1px}
+.tip-bar p{font-size:12px;color:var(--amber-700)}
+
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px;animation:fadeIn .2s ease}
+.modal-overlay.open{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+
+.modal{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:420px;max-height:90dvh;overflow-y:auto;animation:slideUp .3s ease;position:relative}
+.modal-header{padding:16px 16px 12px;border-bottom:1px solid var(--gray-100);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:#fff;border-radius:var(--radius-lg) var(--radius-lg) 0 0;z-index:2}
+.modal-header h3{font-family:'Lexend';font-weight:700;font-size:17px;color:var(--gray-900)}
+.modal-header p{font-size:13px;color:var(--gray-500);margin-top:2px}
+.modal-close{width:32px;height:32px;border-radius:10px;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.modal-close:hover{background:var(--gray-200)}
+.modal-close svg{width:16px;height:16px;color:var(--gray-600)}
+
+.modal-status{padding:10px 16px;display:flex;align-items:center;gap:8px}
+.modal-status.urgent{background:var(--red-50)}
+.modal-status.needs_attention{background:var(--amber-50)}
+.modal-status svg{width:20px;height:20px;flex-shrink:0}
+.modal-status.urgent svg{color:var(--red-600)}
+.modal-status.needs_attention svg{color:var(--amber-600)}
+.modal-status .ms-label{font-size:13px;font-weight:600}
+.modal-status.urgent .ms-label{color:var(--red-700)}
+.modal-status.needs_attention .ms-label{color:var(--amber-700)}
+.modal-status .ms-sub{font-size:11px;color:var(--red-600)}
+
+.modal-body{padding:16px}
+.modal-body h4{font-family:'Lexend';font-weight:600;font-size:14px;color:var(--gray-800);margin-bottom:10px}
+
+/* Soil wheel in modal */
+.wheel-container{width:100%;max-width:340px;margin:0 auto}
+.wheel-container svg{width:100%;height:auto}
+
+.wheel-legend{display:flex;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.legend-label{font-size:10px;font-weight:700;color:var(--gray-700)}
+.legend-desc{font-size:9px;color:var(--gray-500)}
+
+/* Actions in modal */
+.action-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.action-card{border-radius:var(--radius-sm);border:1px solid;padding:10px 12px;display:flex;align-items:flex-start;gap:10px}
+.action-card.high{background:var(--red-50);border-color:var(--red-100)}
+.action-card.medium{background:var(--amber-50);border-color:var(--amber-100)}
+.action-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.action-icon svg{width:16px;height:16px}
+.action-card.high .action-icon svg{color:var(--red-600)}
+.action-card.medium .action-icon svg{color:var(--amber-600)}
+.action-title{font-size:13px;font-weight:600;color:var(--gray-900)}
+.action-title-gu{font-size:11px;color:var(--gray-500)}
+.action-badge{font-size:9px;font-weight:700;color:var(--gray-600);background:rgba(255,255,255,.5);padding:2px 6px;border-radius:4px;display:inline-block;margin-top:4px}
+.action-text{font-size:12px;color:var(--gray-700);font-weight:500}
+.action-text-gu{font-size:11px;color:var(--gray-500)}
+
+.monitor-note{margin-top:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--blue-50);border:1px solid var(--blue-100);display:flex;align-items:flex-start;gap:8px}
+.monitor-note svg{width:16px;height:16px;color:var(--blue-500);flex-shrink:0;margin-top:1px}
+.monitor-note p{font-size:12px;color:#1e40af;font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8c-2 0-4 2-4 4s2 4 4 4"/><path d="M12 6V4m0 16v-2"/></svg>
+    </div>
+    <span class="header-title">Agri360</span>
+    <span class="header-tagline">Smart Farming, Better Tomorrow</span>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">English</button>
+    <button class="lang-btn" onclick="setLang('gu')">ગુજરાતી</button>
+  </div>
+</header>
+
+<div class="main">
+  <!-- Left column -->
+  <div class="left-col">
+
+    <!-- 1. Farmer Details -->
+    <div class="card" style="padding:16px">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <h2 class="section-title" data-i18n="farmerDetails">1. Farmer Details</h2>
+      </div>
+      <div id="farmer-profile"></div>
+    </div>
+
+    <!-- 2. Today's Farm Status -->
+    <div class="card" style="padding:16px">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h2 class="section-title" data-i18n="farmStatus">2. Today's Farm Status</h2>
+      </div>
+      <div id="farm-status-banner"></div>
+      <div class="status-note">
+        <p id="status-note-en">Keep monitoring. No major issues detected.</p>
+        <p id="status-note-gu" style="color:var(--gray-400);margin-top:4px">નિયમિત નિરીક્ષણ કરતા રહો. કોઈ મોટી સમસ્યા નથી.</p>
+      </div>
+      <div class="status-guide">
+        <div class="status-guide-title" data-i18n="statusGuide">Status Guide</div>
+        <div class="guide-item">
+          <div class="guide-dot" style="background:var(--green-500)"></div>
+          <div><div class="guide-label">Good / સારું</div><div class="guide-desc" data-i18n="goodGuide">No issues. Crop is healthy.</div></div>
+        </div>
+        <div class="guide-item">
+          <div class="guide-dot" style="background:var(--amber-500)"></div>
+          <div><div class="guide-label">Needs Attention / ધ્યાન આપવાની જરૂર</div><div class="guide-desc" data-i18n="needsAttentionGuide">Some issues found. Monitor and take action.</div></div>
+        </div>
+        <div class="guide-item">
+          <div class="guide-dot" style="background:var(--red-500)"></div>
+          <div><div class="guide-label">Urgent / તાકીદિક ધ્યાન આપો</div><div class="guide-desc" data-i18n="urgentGuide">Immediate action required.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right column: Eagle Eye 360 -->
+  <div>
+    <div class="card" style="padding:16px">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg></div>
+        <h2 class="section-title" data-i18n="eagleEye">3. Eagle Eye 360° Crop View</h2>
+      </div>
+      <p class="eagle-sub" data-i18n="eagleEyeSub">Click on any cluster to see details</p>
+
+      <div class="location-bar">
+        <div class="loc-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span>Ambod, Mansa, Gandhinagar, Gujarat</span>
+        </div>
+        <div class="loc-right">
+          <span id="last-updated-text">Last updated: —</span>
+          <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()" title="Force refresh now (for testing)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <div class="eagle-map">
+        <div class="eagle-circle"></div>
+        <div class="eagle-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>
+          <span data-i18n="yourFarm">YOUR FARM</span>
+        </div>
+        <div id="clusters-container"></div>
+      </div>
+
+      <div class="tip-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></svg>
+        <p data-i18n="clusterTip">Tip: Tap on any cluster to view detailed information and actions.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-title"></h3>
+        <p id="modal-direction"></p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="modal-status-bar"></div>
+    <div class="modal-body">
+      <div id="modal-wheel"></div>
+      <div id="modal-actions"></div>
+      <div class="monitor-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <p data-i18n="keepMonitoring">Keep monitoring this cluster regularly.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/storage.js"></script>
+<script>
+const CLUSTER_DIRECTIONS = [
+  { n:1, en:'North',      gu:'ઉત્તર' },
+  { n:2, en:'North-East', gu:'ઉત્તર-પૂર્વ' },
+  { n:3, en:'East',       gu:'પૂર્વ' },
+  { n:4, en:'South-East', gu:'દક્ષિણ-પૂર્વ' },
+  { n:5, en:'South',      gu:'દક્ષિણ' },
+  { n:6, en:'South-West', gu:'દક્ષિણ-પશ્ચિમ' },
+  { n:7, en:'West',       gu:'પશ્ચિમ' },
+  { n:8, en:'North-West', gu:'ઉત્તર-પશ્ચિમ' },
+];
+
+const ALERT_TEMPLATES = {
+  moisture:      { type:'water_stress', en:'Water Stress High', gu:'પાણીની અભાવ વધુ છે', act_en:'Irrigate this cluster', act_gu:'આ ક્લસ્ટરમાં સિંચાઈ કરો', severity:'high' },
+  potassium:     { type:'nutrient', en:'Potassium Low', gu:'પોટેશિયમ ઓછું છે', act_en:'Apply MOP (15 kg)', act_gu:'MOP (15 કિ.ગ્રા.) આપો', severity:'high' },
+  nitrogen:      { type:'nutrient', en:'Nitrogen Deficiency', gu:'નાઈટ્રોજનની ઉણપ', act_en:'Apply Urea top dressing', act_gu:'યુરિયા ટોપ ડ્રેસિંગ આપો', severity:'high' },
+  boron:         { type:'nutrient', en:'Boron Deficiency', gu:'બોરોનની ઉણપ', act_en:'Apply Borax spray (0.2%)', act_gu:'બોરેક્સ સ્પ્રે (0.2%) છાંટો', severity:'medium' },
+  organic_carbon:{ type:'nutrient', en:'Low Organic Carbon', gu:'ઓર્ગેનિક કાર્બન ઓછું', act_en:'Apply FYM or compost', act_gu:'છાણિયું ખાતર અથવા કમ્પોસ્ટ આપો', severity:'medium' },
+  pest:          { type:'pest', en:'Pest/Disease Doubt', gu:'જીવાત/રોગની શંકા', act_en:'Check crop and take necessary steps', act_gu:'પાકની તપાસ કરો અને જરૂરી પગલાં લો', severity:'medium' },
+};
+
+let CLUSTERS = [];
+let ALERTS = {};
+const REFRESH_INTERVAL_MS = 3 * 60 * 60 * 1000; // 3 hours
+let lastUpdateTs = Date.now();
+let openClusterN = null;
+
+function randRange(min, max, decimals){
+  const v = Math.random() * (max - min) + min;
+  return decimals ? +v.toFixed(decimals) : Math.round(v);
+}
+
+const STATUS_PARAM_RANGES = {
+  good: {
+    moisture:[60,92], ph:[6.0,7.6], nitrogen:[60,92], phosphorus:[45,68], potassium:[45,76],
+    sulphur:[42,60], organic_carbon:[38,54], boron:[35,50], zinc:[50,74], iron:[48,70], calcium:[45,64],
+  },
+  needs_attention: {
+    moisture:[38,68], ph:[5.8,7.4], nitrogen:[38,68], phosphorus:[28,52], potassium:[26,52],
+    sulphur:[24,46], organic_carbon:[20,40], boron:[18,38], zinc:[38,60], iron:[36,56], calcium:[34,52],
+  },
+  urgent: {
+    moisture:[20,48], ph:[5.4,7.0], nitrogen:[20,48], phosphorus:[14,34], potassium:[12,30],
+    sulphur:[14,30], organic_carbon:[12,26], boron:[10,24], zinc:[24,44], iron:[24,40], calcium:[22,38],
+  },
+};
+
+function pickClusterStatus(){
+  const r = Math.random();
+  return r < 0.55 ? 'good' : r < 0.85 ? 'needs_attention' : 'urgent';
+}
+
+function generateClusterData(){
+  return CLUSTER_DIRECTIONS.map(dir => {
+    const status = pickClusterStatus();
+    const ranges = STATUS_PARAM_RANGES[status];
+    const cl = { n: dir.n, en: dir.en, gu: dir.gu, status };
+    PARAMS.forEach(p => {
+      const [min, max] = ranges[p.key];
+      cl[p.key] = randRange(min, max, p.isPH ? 1 : 0);
+    });
+    return cl;
+  });
+}
+
+function generateAlerts(clusters){
+  const alerts = {};
+  clusters.forEach(cl => {
+    if(cl.status === 'good') return;
+    const list = [];
+    if(cl.moisture < 35) list.push(ALERT_TEMPLATES.moisture);
+    if(cl.potassium < 35) list.push(ALERT_TEMPLATES.potassium);
+    if(cl.nitrogen < 35) list.push(ALERT_TEMPLATES.nitrogen);
+    if(cl.boron < 28) list.push(ALERT_TEMPLATES.boron);
+    if(cl.organic_carbon < 28) list.push(ALERT_TEMPLATES.organic_carbon);
+    if(!list.length) list.push(ALERT_TEMPLATES.pest);
+    alerts[cl.n] = list;
+  });
+  return alerts;
+}
+
+function monitoringStorageKey(){
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code') || 'demo';
+  return 'agri360_monitoring_' + code;
+}
+
+function regenerateMonitoringData(persist){
+  CLUSTERS = generateClusterData();
+  ALERTS = generateAlerts(CLUSTERS);
+  lastUpdateTs = Date.now();
+  if(persist !== false){
+    localStorage.setItem(monitoringStorageKey(), JSON.stringify({ timestamp:lastUpdateTs, clusters:CLUSTERS }));
+  }
+}
+
+function loadMonitoringData(){
+  let stored = null;
+  try{ stored = JSON.parse(localStorage.getItem(monitoringStorageKey())); }catch(e){}
+  if(stored && Array.isArray(stored.clusters) && (Date.now() - stored.timestamp) < REFRESH_INTERVAL_MS){
+    CLUSTERS = stored.clusters;
+    ALERTS = generateAlerts(CLUSTERS);
+    lastUpdateTs = stored.timestamp;
+  } else {
+    regenerateMonitoringData();
+  }
+}
+
+const PARAMS = [
+  { key:'moisture',        label_en:'Moisture',        label_gu:'ભેજ',              color:'#3b82f6' },
+  { key:'ph',              label_en:'pH',              label_gu:'pH',               color:'#6b7280', isPH:true },
+  { key:'nitrogen',        label_en:'Nitrogen',        label_gu:'નાઈટ્રોજન',       color:'#22c55e' },
+  { key:'phosphorus',      label_en:'Phosphorus',      label_gu:'ફોસ્ફરસ',          color:'#f97316' },
+  { key:'potassium',       label_en:'Potassium',       label_gu:'પોટેશિયમ',         color:'#ef4444' },
+  { key:'sulphur',         label_en:'Sulphur',         label_gu:'સલ્ફર',            color:'#f59e0b' },
+  { key:'organic_carbon',  label_en:'Organic Carbon',  label_gu:'ઓર્ગેનિક કાર્બન', color:'#84cc16' },
+  { key:'boron',           label_en:'Boron',           label_gu:'બોરોન',            color:'#8b5cf6' },
+  { key:'zinc',            label_en:'Zinc',            label_gu:'ઝીંક',             color:'#06b6d4' },
+  { key:'iron',            label_en:'Iron',            label_gu:'આયર્ન',            color:'#1d4ed8' },
+  { key:'calcium',         label_en:'Calcium',         label_gu:'કેલ્શિયમ',         color:'#eab308' },
+];
+
+const ICON_SVG = {
+  water_stress:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+  nutrient:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-1 1.732l-1.5.866a2 2 0 0 0-1 1.732V22h11v-8.143a2 2 0 0 0-1-1.732L15 11.26a2 2 0 0 1-1-1.732V2"/><path d="M8 2h8"/></svg>',
+  pest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2l1.88 1.88M14.12 3.88L16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6z"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>',
+};
+
+let lang = 'en';
+
+const T = {
+  en: {
+    farmerDetails:'1. Farmer Details', farmStatus:"2. Today's Farm Status", eagleEye:'3. Eagle Eye 360° Crop View',
+    eagleEyeSub:'Click on any cluster to see details', clusterTip:'Tip: Tap on any cluster to view detailed information and actions.',
+    farmerName:'Farmer Name', farmId:'Farm ID', farmerCode:'Farmer Code (NFC)', village:'Village', crop:'Crop', mobileNumber:'Mobile Number',
+    farmArea:'Farm Area', sowingDate:'Sowing Date', good:'GOOD', goodDesc:'Your crop is healthy.',
+    needsAttentionDesc:'Some clusters need attention. Please review.', urgentDesc:'Urgent action required in one or more clusters.',
+    needsAttention:'Needs Attention', urgent:'Urgent', urgentAttention:'Urgent Attention Required',
+    statusGuide:'Status Guide', goodGuide:'No issues. Crop is healthy.',
+    needsAttentionGuide:'Some issues found. Monitor and take action.', urgentGuide:'Immediate action required.',
+    yourFarm:'YOUR FARM', keepMonitoring:'Keep monitoring this cluster regularly.',
+    clusterDetails:'Cluster {n} Details', direction:'{dir} Direction',
+    soilHealthReport:'SOIL HEALTH REPORT', fieldCluster:'Field Cluster', testDate:'Test Date: 15 May 2024',
+    action:'Action:', recommendedActions:'Recommended Actions',
+    high:'HIGH', medium:'MEDIUM', low:'LOW',
+    goodLevel:'Good Level (> 60%)', moderateLevel:'Moderate Level (30% - 60%)', lowLevel:'Low Level (< 30%)',
+  },
+  gu: {
+    farmerDetails:'1. ખેડૂત વિગતો', farmStatus:'2. આજની ખેતરની સ્થિતિ', eagleEye:'3. Eagle Eye 360° પાક દૃશ્ય',
+    eagleEyeSub:'વિગતો જોવા માટે કોઈપણ ક્લસ્ટર પર ક્લિક કરો', clusterTip:'સૂચના: કોઈપણ ક્લસ્ટર પર ટેપ કરો વિગતવાર માહિતી અને પગલાં માટે.',
+    farmerName:'ખેડૂતનું નામ', farmId:'ફાર્મ ID', farmerCode:'ખેડૂત કોડ (NFC)', village:'ગામ', crop:'પાક', mobileNumber:'મોબાઈલ નંબર',
+    farmArea:'ફાર્મ વિસ્તાર', sowingDate:'વાવણી તારીખ', good:'સારું', goodDesc:'તમારો પાક સારો છે.',
+    needsAttentionDesc:'કેટલાક ક્લસ્ટરોને ધ્યાન આપવાની જરૂર છે.', urgentDesc:'એક અથવા વધુ ક્લસ્ટરોમાં તાત્કાલિક પગલાં જરૂરી.',
+    needsAttention:'ધ્યાન આપવાની જરૂર', urgent:'તાકીદિક', urgentAttention:'તાકીદિક ધ્યાન આપો',
+    statusGuide:'સ્થિતિ માર્ગદર્શિકા', goodGuide:'કોઈ સમસ્યા નથી. પાક સ્વસ્થ છે.',
+    needsAttentionGuide:'કેટલીક સમસ્યાઓ મળી. નિરીક્ષણ કરો અને પગલાં લો.', urgentGuide:'તાત્કાલિક પગલાં જરૂરી.',
+    yourFarm:'તમારું ખેતર', keepMonitoring:'આ ક્લસ્ટરનું નિયમિત નિરીક્ષણ કરતા રહો.',
+    clusterDetails:'ક્લસ્ટર {n} વિગતો', direction:'{dir} દિશા',
+    soilHealthReport:'જમીન આરોગ્ય અહેવાલ', fieldCluster:'ફીલ્ડ ક્લસ્ટર', testDate:'ટેસ્ટ તારીખ: 15 May 2024',
+    action:'પગલું:', recommendedActions:'ભલામણ કરેલ પગલાં',
+    high:'HIGH', medium:'MEDIUM', low:'LOW',
+    goodLevel:'સારું સ્તર (> 60%)', moderateLevel:'મધ્યમ સ્તર (30% - 60%)', lowLevel:'ઓછું સ્તર (< 30%)',
+  }
+};
+
+function t(key){ return T[lang][key] || T.en[key] || key; }
+
+function getLevel(val, isPH){
+  if(isPH) return val>=6.0 && val<=7.5 ? 'high' : val>=5.5 ? 'medium' : 'low';
+  return val>60 ? 'high' : val>=30 ? 'medium' : 'low';
+}
+function levelColor(l){ return l==='high'?'#22c55e':l==='medium'?'#f59e0b':'#ef4444'; }
+
+function statusText(s){
+  if(s==='good') return t('good');
+  if(s==='urgent') return t('urgent');
+  return t('needsAttention');
+}
+
+function renderClusters(){
+  const c = document.getElementById('clusters-container');
+  c.innerHTML = CLUSTERS.map(cl => `
+    <div class="cluster-btn ${cl.status}" data-n="${cl.n}" onclick="openCluster(${cl.n})">
+      <div class="cluster-box">
+        <span class="num">${cl.n}</span>
+        <span class="dir">${lang==='gu' ? cl.en+' / '+cl.gu : cl.en}</span>
+      </div>
+      <div class="cluster-status">
+        <div class="cluster-dot"></div>
+        <span class="cluster-status-text">${statusText(cl.status)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildWheel(cl){
+  const cx=200,cy=200,outerR=175,innerR=78;
+  const count=PARAMS.length;
+  const arc=(2*Math.PI)/count;
+  let svg = `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Outer ring segments
+  PARAMS.forEach((p,i)=>{
+    const val = cl[p.key];
+    const level = getLevel(val, p.isPH);
+    const col = levelColor(level);
+    const s = -Math.PI/2 + i*arc, e = s+arc;
+    const R = outerR+10;
+    const x1o=cx+R*Math.cos(s), y1o=cy+R*Math.sin(s);
+    const x2o=cx+R*Math.cos(e), y2o=cy+R*Math.sin(e);
+    const x1i=cx+outerR*Math.cos(s), y1i=cy+outerR*Math.sin(s);
+    const x2i=cx+outerR*Math.cos(e), y2i=cy+outerR*Math.sin(e);
+    svg += `<path d="M ${x1o} ${y1o} A ${R} ${R} 0 0 1 ${x2o} ${y2o} L ${x2i} ${y2i} A ${outerR} ${outerR} 0 0 0 ${x1i} ${y1i} Z" fill="${col}" opacity="0.75"/>`;
+  });
+
+  // Inner white circle + green stroke
+  svg += `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="white" stroke="#22c55e" stroke-width="2.5"/>`;
+
+  // Separator lines
+  PARAMS.forEach((_,i)=>{
+    const a = -Math.PI/2 + i*arc;
+    svg += `<line x1="${cx+innerR*Math.cos(a)}" y1="${cy+innerR*Math.sin(a)}" x2="${cx+outerR*Math.cos(a)}" y2="${cy+outerR*Math.sin(a)}" stroke="#e5e7eb" stroke-width="1"/>`;
+  });
+
+  // Labels
+  PARAMS.forEach((p,i)=>{
+    const mid = -Math.PI/2 + (i+0.5)*arc;
+    const lr = (innerR+outerR)/2 + 4;
+    const lx = cx + lr*Math.cos(mid);
+    const ly = cy + lr*Math.sin(mid);
+    const val = cl[p.key];
+    const disp = p.isPH ? val : val+'%';
+    const label = lang==='gu' ? p.label_gu : p.label_en;
+    svg += `<text x="${lx}" y="${ly-7}" text-anchor="middle" font-size="9" font-weight="600" fill="#374151" font-family="Lexend,sans-serif">${label}</text>`;
+    svg += `<text x="${lx}" y="${ly+9}" text-anchor="middle" font-size="13" font-weight="700" fill="${p.color}" font-family="Lexend,sans-serif">${disp}</text>`;
+  });
+
+  // Center text
+  svg += `<text x="${cx}" y="${cy-16}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#15803d" letter-spacing="0.6" font-family="Lexend,sans-serif">${t('soilHealthReport')}</text>`;
+  svg += `<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#166534" font-family="Lexend,sans-serif">${t('fieldCluster')} - ${cl.n}</text>`;
+  svg += `<text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Source Sans 3,sans-serif">${t('testDate')}</text>`;
+
+  svg += `</svg>`;
+  return svg;
+}
+
+function openCluster(n){
+  const cl = CLUSTERS.find(c=>c.n===n);
+  if(!cl) return;
+  openClusterN = n;
+  const dirLabel = lang==='gu' ? cl.en+' / '+cl.gu : cl.en;
+
+  document.getElementById('modal-title').textContent = t('clusterDetails').replace('{n}',n);
+  document.getElementById('modal-direction').textContent = t('direction').replace('{dir}',dirLabel);
+
+  // Status bar
+  const sb = document.getElementById('modal-status-bar');
+  if(cl.status==='urgent' || cl.status==='needs_attention'){
+    const isU = cl.status==='urgent';
+    sb.innerHTML = `<div class="modal-status ${cl.status}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${isU
+        ? '<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'
+        : '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'
+      }</svg>
+      <div>
+        <div class="ms-label">${isU ? t('urgentAttention') : t('needsAttention')}</div>
+        ${isU && lang==='en' ? '<div class="ms-sub">તાકીદિક ધ્યાન આપો</div>' : ''}
+      </div>
+    </div>`;
+  } else {
+    sb.innerHTML = '';
+  }
+
+  // Soil wheel
+  document.getElementById('modal-wheel').innerHTML = `
+    <h4>${t('soilHealthReport')}</h4>
+    <div class="wheel-container">${buildWheel(cl)}</div>
+    <div class="wheel-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div><span class="legend-label">${t('high')}</span><span class="legend-desc">${t('goodLevel')}</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div><span class="legend-label">${t('medium')}</span><span class="legend-desc">${t('moderateLevel')}</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div><span class="legend-label">${t('low')}</span><span class="legend-desc">${t('lowLevel')}</span></div>
+    </div>
+  `;
+
+  // Actions
+  const alerts = ALERTS[n] || [];
+  const actionsEl = document.getElementById('modal-actions');
+  if(alerts.length){
+    actionsEl.innerHTML = `<h4 style="margin-top:16px">${t('recommendedActions')}</h4><div class="action-list">${
+      alerts.map(a => `
+        <div class="action-card ${a.severity}">
+          <div class="action-icon">${ICON_SVG[a.type] || ICON_SVG.nutrient}</div>
+          <div>
+            <div class="action-title">${lang==='gu' ? a.gu : a.en}</div>
+            ${lang==='en' && a.gu ? `<div class="action-title-gu">${a.gu}</div>` : ''}
+            <div class="action-badge">${t('action')}</div>
+            <div class="action-text">${lang==='gu' ? a.act_gu : a.act_en}</div>
+            ${lang==='en' && a.act_gu ? `<div class="action-text-gu">${a.act_gu}</div>` : ''}
+          </div>
+        </div>
+      `).join('')
+    }</div>`;
+  } else {
+    actionsEl.innerHTML = '';
+  }
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+  openClusterN = null;
+}
+
+function renderFarmStatus(){
+  const hasUrgent = CLUSTERS.some(c => c.status === 'urgent');
+  const hasAttention = CLUSTERS.some(c => c.status === 'needs_attention');
+  const status = hasUrgent ? 'urgent' : hasAttention ? 'needs_attention' : 'good';
+  const icons = {
+    good:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    needs_attention:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    urgent:'<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  };
+  const labelKey = status === 'good' ? 'good' : status === 'urgent' ? 'urgent' : 'needsAttention';
+  const descKey = status === 'good' ? 'goodDesc' : status === 'urgent' ? 'urgentDesc' : 'needsAttentionDesc';
+  document.getElementById('farm-status-banner').innerHTML = `
+    <div class="status-banner ${status}">
+      <div class="status-icon ${status}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${icons[status]}</svg>
+      </div>
+      <div>
+        <div class="status-label ${status}">${t(labelKey)}</div>
+        <div class="status-desc">${t(descKey)}</div>
+      </div>
+    </div>`;
+}
+
+function formatDate(iso){
+  if(!iso) return 'Not provided';
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' });
+}
+
+const DEMO_FARMER = {
+  code:'DEMO', farmId:'FM-2025-00125', mitraCardNumber:'MITRA-0000',
+  email:'ramesh.patel@example.com', name:'Rameshbhai Patel', gender:'Male', age:'42', mobile:'98765 43210',
+  village:'Ambod, Mansa', district:'Gandhinagar', state:'Gujarat',
+  proofType:'Aadhar Card', proofTypeOther:'', proofNumber:'XXXX XXXX 4210',
+  landholdingType:'Continuous', landSize:'5.2', landUnit:'Acres', ownershipType:'Owned',
+  soilType:'Black', soilTypeOther:'', waterAvailability:'Yes', waterAvailabilityOther:'',
+  waterSource:['Borewell','Canal'],
+  cropsPast3Years:'Cotton, Groundnut, Wheat',
+  usesPesticides:'No', pesticideDetails:'', nearbyPesticides:'No', nearbyPesticideDistance:'',
+  organicFertilizerUse:'FYM and vermicompost applied every season',
+  crop:'Cotton', cropCycleDuration:'150 days', expectedHarvestDate:'2025-09-20', sowingDate:'2025-04-15',
+  hivesPlaced:'No', pollinationDuration:'', beekeeperExperience:'No', honeybeeTypes:[], organicFarming:'No',
+  govtSchemes:['PM-KISAN Beneficiary','Kisan Credit Card (KCC)'], soilHealthCardDetails:'',
+};
+
+function fv(value, fallback){
+  fallback = fallback || 'Not provided';
+  if(Array.isArray(value)) return value.length ? value.join(', ') : fallback;
+  return (value === undefined || value === null || value === '') ? fallback : value;
+}
+
+function detailItem(label, value, full){
+  return `<div class="detail-item${full ? ' full' : ''}"><div><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div></div>`;
+}
+
+function profileGroup(title, itemsHtml){
+  return `<div class="profile-group"><div class="profile-subhead">${title}</div><div class="detail-grid">${itemsHtml}</div></div>`;
+}
+
+function renderFarmerProfile(farmer){
+  const f = farmer;
+  const proofType = f.proofType === 'Other' ? fv(f.proofTypeOther, 'Other') : fv(f.proofType);
+  const soilType = f.soilType === 'Other' ? fv(f.soilTypeOther, 'Other') : fv(f.soilType);
+  const waterAvail = f.waterAvailability === 'Other' ? fv(f.waterAvailabilityOther, 'Other') : fv(f.waterAvailability);
+
+  document.getElementById('farmer-profile').innerHTML = `
+    <div class="mitra-banner">
+      <div>
+        <div class="mitra-label">MITRA Card Number</div>
+        <div class="mitra-value">${fv(f.mitraCardNumber)}</div>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M7 8V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><circle cx="12" cy="14" r="2.2"/></svg>
+    </div>
+
+    ${profileGroup('Identity &amp; Contact', [
+      detailItem('Farmer Name', fv(f.name)),
+      detailItem('Farmer Code (NFC)', fv(f.code)),
+      detailItem('Farm ID', fv(f.farmId)),
+      detailItem('Email', fv(f.email)),
+      detailItem('Gender', fv(f.gender)),
+      detailItem('Age', fv(f.age)),
+      detailItem('Mobile Number', fv(f.mobile)),
+    ].join(''))}
+
+    ${profileGroup('Location', [
+      detailItem('Village', fv(f.village)),
+      detailItem('District', fv(f.district)),
+      detailItem('State', fv(f.state)),
+    ].join(''))}
+
+    ${profileGroup('Identity Proof', [
+      detailItem('Proof Type', proofType),
+      detailItem('Proof Number', fv(f.proofNumber)),
+    ].join(''))}
+
+    ${profileGroup('Land Details', [
+      detailItem('Type of Landholding', fv(f.landholdingType)),
+      detailItem('Total Land Size', f.landSize ? `${f.landSize} ${fv(f.landUnit,'')}` : 'Not provided'),
+      detailItem('Ownership Type', fv(f.ownershipType)),
+    ].join(''))}
+
+    ${profileGroup('Soil &amp; Water', [
+      detailItem('Soil Type', soilType),
+      detailItem('Water Availability', waterAvail),
+      detailItem('Irrigation / Water Source', fv(f.waterSource), true),
+    ].join(''))}
+
+    ${profileGroup('Cropping &amp; Practices', [
+      detailItem('Crops Cultivated (Past 3 Years)', fv(f.cropsPast3Years), true),
+      detailItem('Current Crop', fv(f.crop)),
+      detailItem('Crop Cycle Duration (approx.)', fv(f.cropCycleDuration)),
+      detailItem('Expected Harvest Date', formatDate(f.expectedHarvestDate)),
+      detailItem('Sowing Date', formatDate(f.sowingDate)),
+      detailItem('Uses Pesticides', fv(f.usesPesticides)),
+      f.usesPesticides === 'Yes' ? detailItem('Pesticide Name &amp; Purpose', fv(f.pesticideDetails), true) : '',
+      detailItem('Nearby Farms Use Pesticides', fv(f.nearbyPesticides)),
+      f.nearbyPesticides === 'Yes' ? detailItem('Distance from Farm (km)', fv(f.nearbyPesticideDistance)) : '',
+      detailItem('Organic/Natural Fertilizer Use', fv(f.organicFertilizerUse), true),
+    ].join(''))}
+
+    ${profileGroup('Pollination &amp; Beekeeping', [
+      detailItem('Hives Placed Before', fv(f.hivesPlaced)),
+      f.hivesPlaced === 'Yes' ? detailItem('Duration of Past Pollination Activities', fv(f.pollinationDuration)) : '',
+      detailItem('Beekeeper / Pollination Experience', fv(f.beekeeperExperience)),
+      detailItem('Honeybee Types', fv(f.honeybeeTypes), true),
+      detailItem('Practices Organic Farming', fv(f.organicFarming)),
+    ].join(''))}
+
+    ${profileGroup('Government Scheme Details', [
+      detailItem('Schemes', fv(f.govtSchemes), true),
+      (f.govtSchemes || []).includes('Soil Health Card') ? detailItem('Soil Health Card Details', fv(f.soilHealthCardDetails), true) : '',
+    ].join(''))}
+  `;
+}
+
+function loadFarmerDetails(){
+  const code = new URLSearchParams(location.search).get('code');
+  const farmer = (code && typeof agri360GetFarmerByCode === 'function') ? agri360GetFarmerByCode(code) : null;
+  renderFarmerProfile(farmer || DEMO_FARMER);
+}
+
+function updateLastUpdatedText(){
+  const remaining = Math.max(0, REFRESH_INTERVAL_MS - (Date.now() - lastUpdateTs));
+  const h = Math.floor(remaining / 3600000);
+  const m = Math.floor((remaining % 3600000) / 60000);
+  const updatedStr = new Date(lastUpdateTs).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('last-updated-text').textContent =
+    `Last updated: ${updatedStr} · Next auto-update in ${h}h ${m}m`;
+}
+
+function refreshAll(){
+  regenerateMonitoringData();
+  renderClusters();
+  renderFarmStatus();
+  updateLastUpdatedText();
+  if(openClusterN && CLUSTERS.find(c => c.n === openClusterN)){
+    openCluster(openClusterN);
+  }
+}
+
+function manualRefresh(){
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  setTimeout(() => btn.classList.remove('spinning'), 600);
+  refreshAll();
+}
+
+function setLang(l){
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (l==='en'?'English':'ગુજરાતી')));
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if(T[l][key]) el.textContent = T[l][key];
+  });
+  renderClusters();
+  renderFarmStatus();
+  // Update header tagline
+  document.querySelector('.header-tagline').textContent = l==='gu' ? 'સ્માર્ટ ખેતી, બહેતર આવતીકાલ' : 'Smart Farming, Better Tomorrow';
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// Init
+loadFarmerDetails();
+loadMonitoringData();
+renderClusters();
+renderFarmStatus();
+updateLastUpdatedText();
+setInterval(() => {
+  if(Date.now() - lastUpdateTs >= REFRESH_INTERVAL_MS) refreshAll();
+  updateLastUpdatedText();
+}, 30000);
+</script>
+</body>
+</html>

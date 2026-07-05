@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agri360 — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green-50:#f0fdf4;--green-100:#dcfce7;--green-200:#bbf7d0;--green-500:#22c55e;
+  --green-600:#16a34a;--green-700:#15803d;--green-800:#166534;--green-900:#14532d;
+  --amber-50:#fffbeb;--amber-500:#f59e0b;
+  --red-50:#fef2f2;--red-500:#ef4444;--red-600:#dc2626;
+  --blue-50:#eff6ff;--blue-500:#3b82f6;--blue-700:#1d4ed8;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+  --radius:16px;--radius-sm:12px;--radius-lg:24px;
+}
+html{font-family:'Source Sans 3',system-ui,sans-serif}
+body{background:linear-gradient(135deg,var(--green-50),#fff,#fffbf0);min-height:100dvh;color:var(--gray-900)}
+h1,h2,h3,.font-heading{font-family:'Lexend',system-ui,sans-serif}
+
+.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.header-brand{display:flex;align-items:center;gap:8px}
+.header-icon{width:32px;height:32px;border-radius:12px;background:var(--green-700);display:flex;align-items:center;justify-content:center}
+.header-icon svg{width:18px;height:18px;color:#fff}
+.header-title{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--green-900)}
+.header-tagline{font-size:11px;color:var(--gray-500);margin-left:6px}
+
+.main{max-width:1100px;margin:0 auto;padding:20px 16px 60px;display:flex;flex-direction:column;gap:20px}
+
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04);padding:20px}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.section-icon{width:28px;height:28px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-icon svg{width:16px;height:16px;color:var(--green-700)}
+.section-title{font-family:'Lexend';font-weight:700;font-size:16px;color:var(--gray-800)}
+.section-sub{font-size:12px;color:var(--gray-500);margin-top:2px}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-500)}
+.field textarea{resize:vertical}
+.field .hint{font-size:11px;color:var(--gray-400);margin-top:4px}
+.field.full{grid-column:1/-1}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn svg{width:14px;height:14px}
+.btn-primary{background:var(--green-600);color:#fff}
+.btn-primary:hover{background:var(--green-700)}
+.btn-secondary{background:var(--gray-100);color:var(--gray-700)}
+.btn-secondary:hover{background:var(--gray-200)}
+.btn-outline{background:#fff;border:1.5px solid var(--gray-200);color:var(--gray-700)}
+.btn-outline:hover{background:var(--gray-50)}
+.btn-danger{background:var(--red-50);color:var(--red-600)}
+.btn-danger:hover{background:var(--red-100,#fee2e2)}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.form-actions{margin-top:6px;display:flex;gap:10px}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--gray-400)}
+.empty-state svg{width:40px;height:40px;margin:0 auto 10px;color:var(--gray-300)}
+.empty-state p{font-size:13px}
+
+.farmer-list{display:flex;flex-direction:column;gap:12px}
+.farmer-card{border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;background:var(--gray-50)}
+.farmer-info{display:flex;flex-direction:column;gap:4px;min-width:200px;flex:1}
+.farmer-code{display:inline-block;font-family:'Lexend';font-weight:700;font-size:12px;color:var(--green-700);background:var(--green-100);padding:2px 8px;border-radius:6px;width:fit-content}
+.mitra-pill{display:inline-block;font-family:'Lexend';font-weight:700;font-size:12px;color:var(--blue-700);background:var(--blue-50);padding:2px 8px;border-radius:6px;width:fit-content}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap}
+.farmer-name{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--gray-900)}
+.farmer-meta{font-size:12px;color:var(--gray-500);display:flex;flex-wrap:wrap;gap:10px}
+.farmer-actions{display:flex;flex-wrap:wrap;gap:8px}
+
+.nfc-row{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-200);width:100%}
+.nfc-row.open{display:flex}
+.nfc-row{align-items:center;gap:8px;flex-wrap:wrap}
+.nfc-url{flex:1;min-width:200px;font-size:12px;padding:8px 10px;border:1.5px solid var(--gray-200);border-radius:8px;background:#fff;color:var(--gray-700);font-family:monospace}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-900);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:200}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.info-banner{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--blue-50);border:1px solid #dbeafe;margin-bottom:16px}
+.info-banner svg{width:16px;height:16px;color:var(--blue-500);flex-shrink:0;margin-top:1px}
+.info-banner p{font-size:12px;color:var(--blue-700);line-height:1.5}
+
+/* Form sections */
+fieldset.form-section{border:1px solid var(--gray-100);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+fieldset.form-section legend{font-family:'Lexend';font-weight:700;font-size:13px;color:var(--green-700);padding:0 6px}
+fieldset.form-section.highlight{border:1.5px solid var(--green-200);background:var(--green-50)}
+.radio-row,.checkbox-row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding-top:2px}
+.radio-row label,.checkbox-row label{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--gray-700);cursor:pointer;font-weight:500;white-space:nowrap}
+.radio-row input[type=radio],.checkbox-row input[type=checkbox]{accent-color:var(--green-600);width:15px;height:15px;cursor:pointer}
+.other-input{margin-left:2px;padding:6px 10px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:12px;width:170px;font-family:inherit}
+.other-input:disabled{background:var(--gray-100);color:var(--gray-300)}
+.inline-input{display:flex;gap:8px}
+.inline-input input{flex:1}
+.inline-input select{width:auto;padding:10px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-family:inherit;font-size:13px}
+.conditional-row{background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 12px;border:1px dashed var(--gray-200)}
+
+@media(max-width:600px){.farmer-actions{width:100%}.farmer-actions .btn{flex:1}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8c-2 0-4 2-4 4s2 4 4 4"/><path d="M12 6V4m0 16v-2"/></svg>
+    </div>
+    <span class="header-title">Agri360</span>
+    <span class="header-tagline">Admin Panel</span>
+  </div>
+</header>
+
+<div class="main">
+  <div class="info-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <p>This is a static, database-free demo. Farmer records are stored in your browser's Local Storage. Monitoring data on the Dashboard and NFC Card page is randomly generated for demonstration purposes. Every field saved here is also shown on that farmer's NFC Card page.</p>
+  </div>
+
+  <!-- Add Farmer -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+      <div>
+        <h2 class="section-title">Add New Farmer</h2>
+        <div class="section-sub">A unique Farmer Code and Farm ID will be generated automatically.</div>
+      </div>
+    </div>
+
+    <form id="farmer-form">
+
+      <fieldset class="form-section">
+        <legend>Personal Details</legend>
+        <div class="form-grid">
+          <div class="field"><label>Email *</label><input type="email" id="f-email" required placeholder="e.g. ramesh@example.com"></div>
+          <div class="field"><label>Full Name *</label><input type="text" id="f-name" required placeholder="e.g. Rameshbhai Patel"></div>
+          <div class="field">
+            <label>Gender</label>
+            <div class="radio-row">
+              <label><input type="radio" name="gender" value="Male" checked> Male</label>
+              <label><input type="radio" name="gender" value="Female"> Female</label>
+            </div>
+          </div>
+          <div class="field"><label>Age</label><input type="number" id="f-age" min="0" max="120" placeholder="e.g. 42"></div>
+          <div class="field"><label>Contact Number *</label><input type="tel" id="f-mobile" required placeholder="e.g. 98765 43210"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Location</legend>
+        <div class="form-grid">
+          <div class="field"><label>Village</label><input type="text" id="f-village" value="Ambod, Mansa">
+            <div class="hint">Only this location is supported for monitoring right now.</div>
+          </div>
+          <div class="field"><label>District</label><input type="text" id="f-district" value="Gandhinagar"></div>
+          <div class="field"><label>State</label><input type="text" id="f-state" value="Gujarat"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Identity Proof</legend>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Proof Type</label>
+            <div class="radio-row">
+              <label><input type="radio" name="proofType" value="Aadhar Card" checked onchange="syncOther('proofType','Other','f-proof-other')"> Aadhar Card</label>
+              <label><input type="radio" name="proofType" value="PAN" onchange="syncOther('proofType','Other','f-proof-other')"> PAN</label>
+              <label><input type="radio" name="proofType" value="Other" onchange="syncOther('proofType','Other','f-proof-other')"> Other:</label>
+              <input type="text" id="f-proof-other" class="other-input" placeholder="Specify proof type" disabled>
+            </div>
+          </div>
+          <div class="field"><label>Proof Number</label><input type="text" id="f-proof-number" placeholder="e.g. XXXX XXXX 1234"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Land Details</legend>
+        <div class="form-grid">
+          <div class="field">
+            <label>Type of Landholding</label>
+            <div class="radio-row">
+              <label><input type="radio" name="landholding" value="Continuous" checked> Continuous</label>
+              <label><input type="radio" name="landholding" value="Discrete"> Discrete</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Total Land Size</label>
+            <div class="inline-input">
+              <input type="number" step="0.1" min="0" id="f-land-size" placeholder="e.g. 5.2">
+              <select id="f-land-unit"><option>Acres</option><option>Hectares</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Ownership Type</label>
+            <div class="radio-row">
+              <label><input type="radio" name="ownership" value="Owned" checked> Owned</label>
+              <label><input type="radio" name="ownership" value="Leased"> Leased</label>
+              <label><input type="radio" name="ownership" value="Community Land"> Community Land</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Soil &amp; Water</legend>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Soil Type (if known)</label>
+            <div class="radio-row">
+              <label><input type="radio" name="soilType" value="Black" checked onchange="syncOther('soilType','Other','f-soil-other')"> Black</label>
+              <label><input type="radio" name="soilType" value="Red" onchange="syncOther('soilType','Other','f-soil-other')"> Red</label>
+              <label><input type="radio" name="soilType" value="Sandy" onchange="syncOther('soilType','Other','f-soil-other')"> Sandy</label>
+              <label><input type="radio" name="soilType" value="Clay" onchange="syncOther('soilType','Other','f-soil-other')"> Clay</label>
+              <label><input type="radio" name="soilType" value="Other" onchange="syncOther('soilType','Other','f-soil-other')"> Other:</label>
+              <input type="text" id="f-soil-other" class="other-input" placeholder="Specify soil type" disabled>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Water Availability (own water or not)</label>
+            <div class="radio-row">
+              <label><input type="radio" name="waterAvail" value="Yes" checked onchange="syncOther('waterAvail','Other','f-water-avail-other')"> Yes</label>
+              <label><input type="radio" name="waterAvail" value="No" onchange="syncOther('waterAvail','Other','f-water-avail-other')"> No</label>
+              <label><input type="radio" name="waterAvail" value="Other" onchange="syncOther('waterAvail','Other','f-water-avail-other')"> Other:</label>
+              <input type="text" id="f-water-avail-other" class="other-input" placeholder="Specify" disabled>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Irrigation / Water Source</label>
+            <div class="checkbox-row">
+              <label><input type="checkbox" name="waterSource" value="Borewell"> Borewell</label>
+              <label><input type="checkbox" name="waterSource" value="Canal"> Canal</label>
+              <label><input type="checkbox" name="waterSource" value="Pond"> Pond</label>
+              <label><input type="checkbox" name="waterSource" value="River"> River</label>
+              <label><input type="checkbox" name="waterSource" value="Rainfed"> Rainfed</label>
+              <label><input type="checkbox" id="water-source-other-cb" value="Other" onchange="toggleEnabled(this,'f-water-source-other')"> Other:</label>
+              <input type="text" id="f-water-source-other" class="other-input" placeholder="Specify source" disabled>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Cropping &amp; Practices</legend>
+        <div class="form-grid">
+          <div class="field full"><label>Crops Cultivated in the Past 3 Years</label><textarea id="f-crops-past" rows="2" placeholder="e.g. Cotton, Groundnut, Wheat"></textarea></div>
+
+          <div class="field">
+            <label>Do You Use Pesticides?</label>
+            <div class="radio-row">
+              <label><input type="radio" name="usesPesticides" value="Yes" onchange="toggleRow('pesticide-details-row',true)"> Yes</label>
+              <label><input type="radio" name="usesPesticides" value="No" checked onchange="toggleRow('pesticide-details-row',false)"> No</label>
+            </div>
+          </div>
+          <div class="field full conditional-row" id="pesticide-details-row" style="display:none">
+            <label>Pesticide Name &amp; Purpose (crop-wise)</label>
+            <textarea id="f-pesticide-details" rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Do Nearby Farms Use Pesticides?</label>
+            <div class="radio-row">
+              <label><input type="radio" name="nearbyPesticides" value="Yes" onchange="toggleRow('nearby-distance-row',true)"> Yes</label>
+              <label><input type="radio" name="nearbyPesticides" value="No" checked onchange="toggleRow('nearby-distance-row',false)"> No</label>
+            </div>
+          </div>
+          <div class="field conditional-row" id="nearby-distance-row" style="display:none">
+            <label>Distance from Your Farm (approx. km)</label>
+            <input type="number" step="0.1" min="0" id="f-nearby-distance">
+          </div>
+
+          <div class="field full"><label>Use of Organic/Natural Fertilizers</label><textarea id="f-organic-fertilizer" rows="2" placeholder="e.g. FYM, vermicompost, Jeevamrut"></textarea></div>
+
+          <div class="field"><label>Current Crop</label><input type="text" id="f-crop" placeholder="e.g. Cotton"></div>
+          <div class="field"><label>Current Crop Cycle Duration (approx.)</label><input type="text" id="f-crop-cycle" placeholder="e.g. 150 days"></div>
+          <div class="field"><label>Current Crop Expected Harvest Date</label><input type="date" id="f-harvest-date"></div>
+          <div class="field"><label>Sowing Date</label><input type="date" id="f-sowing"></div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Pollination &amp; Beekeeping</legend>
+        <div class="form-grid">
+          <div class="field">
+            <label>Have Hives Been Placed on Your Farm Before?</label>
+            <div class="radio-row">
+              <label><input type="radio" name="hivesPlaced" value="Yes" onchange="toggleRow('pollination-duration-row',true)"> Yes</label>
+              <label><input type="radio" name="hivesPlaced" value="No" checked onchange="toggleRow('pollination-duration-row',false)"> No</label>
+            </div>
+          </div>
+          <div class="field conditional-row" id="pollination-duration-row" style="display:none">
+            <label>Duration of Past Pollination Activities</label>
+            <input type="text" id="f-pollination-duration" placeholder="e.g. 2 seasons, 3 months">
+          </div>
+
+          <div class="field">
+            <label>Experience with Beekeepers / Pollination Services</label>
+            <div class="radio-row">
+              <label><input type="radio" name="beekeeperExperience" value="Yes"> Yes</label>
+              <label><input type="radio" name="beekeeperExperience" value="No" checked> No</label>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Which Honeybees for Pollination Services</label>
+            <div class="checkbox-row">
+              <label><input type="checkbox" name="honeybeeType" value="Mellifera"> Mellifera</label>
+              <label><input type="checkbox" name="honeybeeType" value="Trigona"> Trigona</label>
+              <label><input type="checkbox" name="honeybeeType" value="Cerana"> Cerana</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Do You Practice Organic Farming?</label>
+            <div class="radio-row">
+              <label><input type="radio" name="organicFarming" value="Yes"> Yes</label>
+              <label><input type="radio" name="organicFarming" value="No" checked> No</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>Government Scheme Details</legend>
+        <div class="form-grid">
+          <div class="field full">
+            <div class="checkbox-row">
+              <label><input type="checkbox" name="govtScheme" value="FPO/FPC Member"> FPO/FPC Member</label>
+              <label><input type="checkbox" name="govtScheme" value="SHG Membership"> SHG Membership</label>
+              <label><input type="checkbox" name="govtScheme" value="PM-KISAN Beneficiary"> PM-KISAN Beneficiary</label>
+              <label><input type="checkbox" name="govtScheme" value="Crop Insurance"> Crop Insurance</label>
+              <label><input type="checkbox" id="soil-health-card-cb" value="Soil Health Card" onchange="toggleRow('soil-health-card-row', this.checked)"> Soil Health Card</label>
+              <label><input type="checkbox" name="govtScheme" value="Kisan Credit Card (KCC)"> Kisan Credit Card (KCC)</label>
+              <label><input type="checkbox" name="govtScheme" value="Cooperative Society Member"> Cooperative Society Member</label>
+              <label><input type="checkbox" name="govtScheme" value="Krishi Vikas Yojana"> Krishi Vikas Yojana</label>
+              <label><input type="checkbox" id="scheme-other-cb" value="Other" onchange="toggleEnabled(this,'f-scheme-other')"> Other:</label>
+              <input type="text" id="f-scheme-other" class="other-input" placeholder="Specify scheme" disabled>
+            </div>
+          </div>
+          <div class="field full conditional-row" id="soil-health-card-row" style="display:none">
+            <label>Soil Health Card Details (card number / issue details)</label>
+            <input type="text" id="f-soil-health-card-details">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section highlight">
+        <legend>Card Details</legend>
+        <div class="form-grid">
+          <div class="field"><label>MITRA Card Number *</label><input type="text" id="f-mitra-card" required placeholder="e.g. MITRA-0001"></div>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Farmer
+        </button>
+        <button type="reset" class="btn btn-secondary" onclick="resetConditionals()">Clear</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Farmer List -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div>
+        <h2 class="section-title">Registered Farmers</h2>
+        <div class="section-sub" id="farmer-count">0 farmers registered</div>
+      </div>
+    </div>
+    <div id="farmer-list" class="farmer-list"></div>
+    <div id="empty-state" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <p>No farmers added yet. Use the form above to add your first farmer.</p>
+    </div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copy-toast">Link copied to clipboard</div>
+
+<script src="assets/storage.js"></script>
+<script>
+function pageUrl(file, code){
+  const base = location.href.replace(/index\.html.*$/, '').replace(/\/$/, '');
+  return `${base}/${file}?code=${encodeURIComponent(code)}`;
+}
+
+/* ---- form helpers ---- */
+function syncOther(groupName, otherValue, inputId){
+  const checked = document.querySelector(`input[name="${groupName}"]:checked`);
+  const el = document.getElementById(inputId);
+  const isOther = checked && checked.value === otherValue;
+  el.disabled = !isOther;
+  if(!isOther) el.value = '';
+}
+function toggleEnabled(checkbox, inputId){
+  const el = document.getElementById(inputId);
+  el.disabled = !checkbox.checked;
+  if(!checkbox.checked) el.value = '';
+}
+function toggleRow(rowId, show){
+  document.getElementById(rowId).style.display = show ? '' : 'none';
+}
+function resetConditionals(){
+  setTimeout(() => {
+    ['pesticide-details-row','nearby-distance-row','pollination-duration-row','soil-health-card-row'].forEach(id => toggleRow(id, false));
+    document.querySelectorAll('.other-input').forEach(el => { el.disabled = true; el.value = ''; });
+    document.querySelectorAll('#water-source-other-cb,#soil-health-card-cb,#scheme-other-cb').forEach(cb => cb.checked = false);
+  }, 0);
+}
+
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function radioVal(name){ const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+function checkedVals(name){ return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(el => el.value); }
+
+function collectWaterSources(){
+  const sources = checkedVals('waterSource');
+  const otherCb = document.getElementById('water-source-other-cb');
+  if(otherCb.checked && val('f-water-source-other')) sources.push(val('f-water-source-other'));
+  return sources;
+}
+function collectGovtSchemes(){
+  const schemes = checkedVals('govtScheme');
+  if(document.getElementById('soil-health-card-cb').checked) schemes.push('Soil Health Card');
+  const otherCb = document.getElementById('scheme-other-cb');
+  if(otherCb.checked && val('f-scheme-other')) schemes.push(val('f-scheme-other'));
+  return schemes;
+}
+
+function render(){
+  const farmers = agri360GetFarmers();
+  const list = document.getElementById('farmer-list');
+  const empty = document.getElementById('empty-state');
+  document.getElementById('farmer-count').textContent =
+    `${farmers.length} farmer${farmers.length===1?'':'s'} registered`;
+
+  if(!farmers.length){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = farmers.slice().reverse().map(f => `
+    <div class="farmer-card">
+      <div class="farmer-info">
+        <div class="pill-row">
+          <span class="farmer-code">${f.code}</span>
+          <span class="mitra-pill">MITRA: ${f.mitraCardNumber || '—'}</span>
+        </div>
+        <span class="farmer-name">${f.name}</span>
+        <div class="farmer-meta">
+          <span>🌾 ${f.crop || '—'}</span>
+          <span>📍 ${f.village}, ${f.district}, ${f.state}</span>
+          <span>📏 ${f.landSize || '—'} ${f.landUnit || ''}</span>
+          <span>🆔 ${f.farmId}</span>
+        </div>
+      </div>
+      <div class="farmer-actions">
+        <button class="btn btn-primary btn-sm" onclick="window.open('dashboard.html?code=${encodeURIComponent(f.code)}','_blank')">
+          📹 Farm Dashboard
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="toggleNfc('${f.code}')">🔗 NFC Card Link</button>
+        <button class="btn btn-danger btn-sm" onclick="removeFarmer('${f.code}')">Delete</button>
+      </div>
+      <div class="nfc-row" id="nfc-${f.code}">
+        <input class="nfc-url" readonly id="nfc-url-${f.code}" value="${pageUrl('agri360-mobile.html', f.code)}">
+        <button class="btn btn-secondary btn-sm" onclick="copyNfc('${f.code}')">Copy</button>
+        <button class="btn btn-outline btn-sm" onclick="window.open('agri360-mobile.html?code=${encodeURIComponent(f.code)}','_blank')">Preview</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleNfc(code){
+  document.getElementById('nfc-'+code).classList.toggle('open');
+}
+
+function copyNfc(code){
+  const input = document.getElementById('nfc-url-'+code);
+  input.select();
+  navigator.clipboard.writeText(input.value).then(showToast).catch(()=>{
+    document.execCommand('copy');
+    showToast();
+  });
+}
+
+function showToast(){
+  const t = document.getElementById('copy-toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function removeFarmer(code){
+  if(!confirm('Delete this farmer record? This cannot be undone.')) return;
+  agri360DeleteFarmer(code);
+  render();
+}
+
+document.getElementById('farmer-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const farmer = {
+    code: agri360GenerateFarmerCode(),
+    farmId: agri360GenerateFarmId(),
+    mitraCardNumber: val('f-mitra-card'),
+
+    email: val('f-email'),
+    name: val('f-name'),
+    gender: radioVal('gender'),
+    age: val('f-age'),
+    mobile: val('f-mobile'),
+
+    village: val('f-village') || 'Ambod, Mansa',
+    district: val('f-district') || 'Gandhinagar',
+    state: val('f-state') || 'Gujarat',
+
+    proofType: radioVal('proofType'),
+    proofTypeOther: val('f-proof-other'),
+    proofNumber: val('f-proof-number'),
+
+    landholdingType: radioVal('landholding'),
+    landSize: val('f-land-size'),
+    landUnit: val('f-land-unit'),
+    ownershipType: radioVal('ownership'),
+
+    soilType: radioVal('soilType'),
+    soilTypeOther: val('f-soil-other'),
+    waterAvailability: radioVal('waterAvail'),
+    waterAvailabilityOther: val('f-water-avail-other'),
+    waterSource: collectWaterSources(),
+
+    cropsPast3Years: val('f-crops-past'),
+    usesPesticides: radioVal('usesPesticides'),
+    pesticideDetails: val('f-pesticide-details'),
+    nearbyPesticides: radioVal('nearbyPesticides'),
+    nearbyPesticideDistance: val('f-nearby-distance'),
+    organicFertilizerUse: val('f-organic-fertilizer'),
+
+    crop: val('f-crop'),
+    cropCycleDuration: val('f-crop-cycle'),
+    expectedHarvestDate: val('f-harvest-date'),
+    sowingDate: val('f-sowing'),
+
+    hivesPlaced: radioVal('hivesPlaced'),
+    pollinationDuration: val('f-pollination-duration'),
+    beekeeperExperience: radioVal('beekeeperExperience'),
+    honeybeeTypes: checkedVals('honeybeeType'),
+    organicFarming: radioVal('organicFarming'),
+
+    govtSchemes: collectGovtSchemes(),
+    soilHealthCardDetails: val('f-soil-health-card-details'),
+
+    createdAt: new Date().toISOString(),
+  };
+  agri360AddFarmer(farmer);
+  this.reset();
+  document.getElementById('f-village').value = 'Ambod, Mansa';
+  document.getElementById('f-district').value = 'Gandhinagar';
+  document.getElementById('f-state').value = 'Gujarat';
+  resetConditionals();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

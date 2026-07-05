@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agri360 — Farm Monitoring Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green-50:#f0fdf4;--green-100:#dcfce7;--green-200:#bbf7d0;--green-500:#22c55e;
+  --green-600:#16a34a;--green-700:#15803d;--green-800:#166534;--green-900:#14532d;
+  --amber-50:#fffbeb;--amber-500:#f59e0b;--amber-700:#b45309;
+  --red-50:#fef2f2;--red-500:#ef4444;--red-600:#dc2626;--red-700:#b91c1c;
+  --blue-50:#eff6ff;--blue-500:#3b82f6;
+  --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;
+  --gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+  --radius:16px;--radius-sm:12px;--radius-lg:24px;
+}
+html{font-family:'Source Sans 3',system-ui,sans-serif}
+body{background:linear-gradient(135deg,var(--green-50),#fff,#fffbf0);min-height:100dvh;color:var(--gray-900)}
+h1,h2,h3,.font-heading{font-family:'Lexend',system-ui,sans-serif}
+
+.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.header-brand{display:flex;align-items:center;gap:8px}
+.header-icon{width:32px;height:32px;border-radius:12px;background:var(--green-700);display:flex;align-items:center;justify-content:center}
+.header-icon svg{width:18px;height:18px;color:#fff}
+.header-title{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--green-900)}
+.header-tagline{font-size:11px;color:var(--gray-500);margin-left:6px}
+.live-badge{display:flex;align-items:center;gap:6px;background:var(--red-50);color:var(--red-600);font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red-500);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.main{max-width:1100px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+@media(min-width:1024px){.main{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;padding:20px}.col{display:flex;flex-direction:column;gap:16px}}
+
+.card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04);padding:18px}
+.section-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.section-icon{width:28px;height:28px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-icon svg{width:16px;height:16px;color:var(--green-700)}
+.section-title{font-family:'Lexend';font-weight:700;font-size:15px;color:var(--gray-800)}
+.section-sub{font-size:11px;color:var(--gray-500);margin-top:1px}
+
+/* Farmer banner */
+.farmer-banner{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.farmer-banner .who{display:flex;flex-direction:column;gap:2px}
+.farmer-banner .who .name{font-family:'Lexend';font-weight:700;font-size:16px}
+.farmer-banner .who .meta{font-size:12px;color:var(--gray-500)}
+.code-pill{font-family:'Lexend';font-weight:700;font-size:12px;color:var(--green-700);background:var(--green-100);padding:4px 10px;border-radius:8px}
+.warn-banner{display:flex;gap:8px;align-items:flex-start;background:var(--amber-50);border:1px solid #fde68a;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:14px}
+.warn-banner svg{width:16px;height:16px;color:var(--amber-500);flex-shrink:0;margin-top:1px}
+.warn-banner p{font-size:12px;color:var(--amber-700)}
+
+/* Camera feed */
+.feed{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/10;background:linear-gradient(160deg,#0f3d1f,#1d5c33 45%,#2f7a45);display:flex;align-items:center;justify-content:center;transition:background 1s}
+.feed-overlay{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.08),transparent 60%)}
+.feed-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:32px 32px}
+.feed-rec{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:6px;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px}
+.feed-rec .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse 1.2s infinite}
+.feed-time{position:absolute;top:10px;right:12px;color:rgba(255,255,255,.85);font-size:10px;font-family:monospace}
+.feed-compass{position:absolute;bottom:10px;left:12px;color:#fff;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);padding:4px 9px;border-radius:8px}
+.feed-vcam{position:absolute;bottom:10px;right:12px;color:#fff;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);padding:4px 9px;border-radius:8px}
+.feed-icon{position:relative;z-index:2;color:rgba(255,255,255,.9);opacity:.85;transition:transform .3s}
+.feed-icon svg{width:56px;height:56px}
+
+/* PTZ controls */
+.ptz-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.ptz-panel{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ptz-panel-title{font-size:11px;font-weight:700;color:var(--gray-600);text-align:center;letter-spacing:.3px}
+.ptz-panel-sub{font-size:10px;color:var(--gray-400);text-align:center;margin-top:-6px}
+
+.dpad{display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:4px}
+.dpad button{grid-column:2;background:#fff;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.dpad button:hover{background:var(--green-50);border-color:var(--green-400,#4ade80)}
+.dpad button:active{transform:scale(.92);background:var(--green-100)}
+.dpad button svg{width:18px;height:18px;color:var(--green-700)}
+.dpad .up{grid-row:1}
+.dpad .left{grid-row:2;grid-column:1}
+.dpad .center{grid-row:2;grid-column:2;background:var(--green-700);display:flex;align-items:center;justify-content:center;border-radius:10px}
+.dpad .center svg{width:14px;height:14px;color:#fff}
+.dpad .right{grid-row:2;grid-column:3}
+.dpad .down{grid-row:3}
+
+.vpad{display:flex;flex-direction:column;gap:4px;align-items:center}
+.vpad button{width:44px;height:44px;background:#fff;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.vpad button:hover{background:var(--blue-50);border-color:var(--blue-500)}
+.vpad button:active{transform:scale(.92)}
+.vpad button svg{width:18px;height:18px;color:var(--blue-500)}
+.vpad-center{width:44px;height:44px;background:var(--gray-700);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;text-align:center;line-height:1.1}
+
+.status-banner{border-radius:var(--radius);border:2px solid;padding:14px;display:flex;align-items:center;gap:12px;margin-top:16px}
+.status-banner.good{background:var(--green-50);border-color:var(--green-200)}
+.status-banner.needs_attention{background:var(--amber-50);border-color:#fde68a}
+.status-banner.urgent{background:var(--red-50);border-color:#fecaca}
+.status-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.status-icon.good{background:var(--green-100)}
+.status-icon.needs_attention{background:#fef3c7}
+.status-icon.urgent{background:var(--red-100,#fee2e2)}
+.status-icon svg{width:24px;height:24px}
+.status-icon.good svg{color:var(--green-600)}
+.status-icon.needs_attention svg{color:var(--amber-500)}
+.status-icon.urgent svg{color:var(--red-600)}
+.status-label{font-family:'Lexend';font-weight:700;font-size:16px}
+.status-label.good{color:var(--green-600)}
+.status-label.needs_attention{color:var(--amber-700)}
+.status-label.urgent{color:var(--red-700)}
+.status-desc{font-size:12px;color:var(--gray-600)}
+
+/* Data grids */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-card{border-radius:var(--radius-sm);padding:10px 12px;background:var(--gray-50);border-left:4px solid var(--gray-300);transition:all .3s}
+.stat-label{font-size:10px;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.stat-value{font-family:'Lexend';font-weight:700;font-size:16px;color:var(--gray-900);margin-top:2px}
+.stat-card.high{border-left-color:var(--green-500)}
+.stat-card.medium{border-left-color:var(--amber-500)}
+.stat-card.low{border-left-color:var(--red-500)}
+
+.refresh-note{font-size:11px;color:var(--gray-400);margin-top:12px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8c-2 0-4 2-4 4s2 4 4 4"/><path d="M12 6V4m0 16v-2"/></svg></div>
+    <span class="header-title">Agri360</span>
+    <span class="header-tagline">Farm Monitoring Dashboard</span>
+  </div>
+  <div class="live-badge"><span class="live-dot"></span>LIVE PTZ</div>
+</header>
+
+<div class="main">
+  <div class="col">
+    <!-- Farmer banner -->
+    <div class="card">
+      <div id="warn-banner"></div>
+      <div class="farmer-banner">
+        <div class="who">
+          <div class="name" id="farmer-name">—</div>
+          <div class="meta" id="farmer-meta">—</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <span class="code-pill" id="farmer-code">—</span>
+          <span class="code-pill" id="farmer-mitra" style="background:var(--blue-50,#eff6ff);color:var(--blue-500,#3b82f6)">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Camera feed + PTZ -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
+        <div>
+          <h2 class="section-title">PTZ Camera Control</h2>
+          <div class="section-sub">Dual camera rig · 360° pan-tilt + 90° vertical scan</div>
+        </div>
+      </div>
+
+      <div class="feed" id="feed">
+        <div class="feed-grid"></div>
+        <div class="feed-overlay"></div>
+        <div class="feed-rec"><span class="dot"></span>REC</div>
+        <div class="feed-time" id="feed-time">--:--:--</div>
+        <div class="feed-compass" id="feed-compass">Cam 1 · N · Mid</div>
+        <div class="feed-vcam" id="feed-vcam">Cam 2 · Mid Canopy</div>
+        <div class="feed-icon" id="feed-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>
+        </div>
+      </div>
+
+      <div class="ptz-panels">
+        <div class="ptz-panel">
+          <div class="ptz-panel-title">CAMERA 1 — 360° PAN / TILT</div>
+          <div class="ptz-panel-sub" id="cam1-readout">Facing N · Tilt Mid</div>
+          <div class="dpad">
+            <button class="up" onclick="tiltUp()" title="Tilt up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+            <button class="left" onclick="panLeft()" title="Pan left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+            <div class="center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg></div>
+            <button class="right" onclick="panRight()" title="Pan right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+            <button class="down" onclick="tiltDown()" title="Tilt down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
+          </div>
+        </div>
+
+        <div class="ptz-panel">
+          <div class="ptz-panel-title">CAMERA 2 — 90° VERTICAL SCAN</div>
+          <div class="ptz-panel-sub" id="cam2-readout">Mid Canopy</div>
+          <div class="vpad">
+            <button onclick="vcamUp()" title="Scan up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+            <div class="vpad-center">CAM<br>2</div>
+            <button onclick="vcamDown()" title="Scan down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="refresh-note">Readings refresh automatically whenever the camera position changes.</div>
+    </div>
+  </div>
+
+  <div class="col">
+    <!-- Farm status -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h2 class="section-title">Live Farm Status</h2>
+      </div>
+      <div id="status-banner"></div>
+    </div>
+
+    <!-- Soil health -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-1 1.732l-1.5.866a2 2 0 0 0-1 1.732V22h11v-8.143a2 2 0 0 0-1-1.732L15 11.26a2 2 0 0 1-1-1.732V2"/><path d="M8 2h8"/></svg></div>
+        <div>
+          <h2 class="section-title">Soil Health</h2>
+          <div class="section-sub" id="soil-loc-sub">Reading for current PTZ position</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="soil-grid"></div>
+    </div>
+
+    <!-- Crop health -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg></div>
+        <div>
+          <h2 class="section-title">Crop Health</h2>
+          <div class="section-sub" id="crop-loc-sub">Reading for current vertical scan level</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="crop-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/storage.js"></script>
+<script>
+const COMPASS = ['N','NE','E','SE','S','SW','W','NW'];
+const TILT_LEVELS = ['Low','Mid','High'];
+const VCAM_LEVELS = ['Soil Level','Mid Canopy','Canopy Top'];
+const FEED_BG = {
+  'Soil Level':'linear-gradient(160deg,#3b2a1a,#5c4326 45%,#7a5c33)',
+  'Mid Canopy':'linear-gradient(160deg,#0f3d1f,#1d5c33 45%,#2f7a45)',
+  'Canopy Top':'linear-gradient(160deg,#173d0f,#3a7a1d 45%,#6bbf3a)',
+};
+
+let pan = 0, tilt = 1, vcam = 1;
+
+function loadFarmer(){
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const farmer = code ? agri360GetFarmerByCode(code) : null;
+
+  if(farmer){
+    document.getElementById('farmer-name').textContent = farmer.name;
+    document.getElementById('farmer-meta').textContent = `${farmer.crop || '—'} · ${farmer.village}, ${farmer.district}, ${farmer.state} · ${farmer.landSize || '—'} ${farmer.landUnit || ''}`;
+    document.getElementById('farmer-code').textContent = farmer.code;
+    document.getElementById('farmer-mitra').textContent = 'MITRA: ' + (farmer.mitraCardNumber || '—');
+  } else {
+    document.getElementById('warn-banner').innerHTML = `
+      <div class="warn-banner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <p>No farmer code found in the link. Showing demo data — open this dashboard from the Admin Panel's "Farm Dashboard" button for a real farmer record.</p>
+      </div>`;
+    document.getElementById('farmer-name').textContent = 'Demo Farmer';
+    document.getElementById('farmer-meta').textContent = 'Cotton · Ambod, Mansa, Gandhinagar, Gujarat · 5.2 Acres';
+    document.getElementById('farmer-code').textContent = 'DEMO';
+    document.getElementById('farmer-mitra').textContent = 'MITRA: DEMO-0000';
+  }
+}
+
+function rand(min, max, decimals){
+  const v = Math.random()*(max-min)+min;
+  return decimals ? +v.toFixed(decimals) : Math.round(v);
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function level(val, low, high){ return val>=high ? 'high' : val>=low ? 'medium' : 'low'; }
+
+const STATUS_PARAM_RANGES = {
+  good:            { moisture:[60,92], ph:[6.0,7.6], nitrogen:[60,92], phosphorus:[45,68], potassium:[45,76], sulphur:[42,60], organic_carbon:[38,54], boron:[35,50], zinc:[50,74], iron:[48,70], calcium:[45,64] },
+  needs_attention: { moisture:[38,68], ph:[5.8,7.4], nitrogen:[38,68], phosphorus:[28,52], potassium:[26,52], sulphur:[24,46], organic_carbon:[20,40], boron:[18,38], zinc:[38,60], iron:[36,56], calcium:[34,52] },
+  urgent:          { moisture:[20,48], ph:[5.4,7.0], nitrogen:[20,48], phosphorus:[14,34], potassium:[12,30], sulphur:[14,30], organic_carbon:[12,26], boron:[10,24], zinc:[24,44], iron:[24,40], calcium:[22,38] },
+};
+
+function pickPositionStatus(){
+  const r = Math.random();
+  return r < 0.55 ? 'good' : r < 0.85 ? 'needs_attention' : 'urgent';
+}
+
+function generateSoil(status){
+  const R = STATUS_PARAM_RANGES[status];
+  const moisture = rand(...R.moisture);
+  const ph = rand(R.ph[0], R.ph[1], 1);
+  const nitrogen = rand(...R.nitrogen);
+  const phosphorus = rand(...R.phosphorus);
+  const potassium = rand(...R.potassium);
+  const sulphur = rand(...R.sulphur);
+  const organic_carbon = rand(...R.organic_carbon);
+  const boron = rand(...R.boron);
+  const zinc = rand(...R.zinc);
+  const iron = rand(...R.iron);
+  const calcium = rand(...R.calcium);
+  return [
+    {label:'Moisture', value:moisture+'%', lvl:level(moisture,30,60)},
+    {label:'Soil pH', value:ph, lvl:(ph>=6.0&&ph<=7.5)?'high':(ph>=5.5?'medium':'low')},
+    {label:'Nitrogen (N)', value:nitrogen+'%', lvl:level(nitrogen,30,60)},
+    {label:'Phosphorus (P)', value:phosphorus+'%', lvl:level(phosphorus,30,60)},
+    {label:'Potassium (K)', value:potassium+'%', lvl:level(potassium,30,60)},
+    {label:'Sulphur', value:sulphur+'%', lvl:level(sulphur,30,60)},
+    {label:'Organic Carbon', value:organic_carbon+'%', lvl:level(organic_carbon,30,60)},
+    {label:'Boron', value:boron+'%', lvl:level(boron,30,60)},
+    {label:'Zinc', value:zinc+'%', lvl:level(zinc,30,60)},
+    {label:'Iron', value:iron+'%', lvl:level(iron,30,60)},
+    {label:'Calcium', value:calcium+'%', lvl:level(calcium,30,60)},
+  ];
+}
+
+function generateCrop(status){
+  let health, pestPool, canopy, leafPool;
+  if(status==='good'){ health=rand(70,98); pestPool=['Low','Low','Low','Medium']; canopy=rand(65,95); leafPool=['Normal','Normal','Dark Green']; }
+  else if(status==='needs_attention'){ health=rand(45,72); pestPool=['Low','Medium','Medium','High']; canopy=rand(45,72); leafPool=['Normal','Pale']; }
+  else { health=rand(20,48); pestPool=['Medium','High','High']; canopy=rand(25,50); leafPool=['Pale','Pale','Normal']; }
+  const pest = pick(pestPool);
+  const stage = pick(['Germination','Vegetative','Flowering','Fruiting','Maturity']);
+  const leaf = pick(leafPool);
+  return [
+    {label:'Health Score', value:health+'%', lvl:level(health,40,70)},
+    {label:'Pest/Disease Risk', value:pest, lvl:pest==='Low'?'high':pest==='Medium'?'medium':'low'},
+    {label:'Growth Stage', value:stage, lvl:'medium'},
+    {label:'Canopy Density', value:canopy+'%', lvl:level(canopy,40,70)},
+    {label:'Leaf Colour Index', value:leaf, lvl:leaf==='Pale'?'low':'high'},
+  ];
+}
+
+function renderGrid(el, items){
+  el.innerHTML = items.map(i => `
+    <div class="stat-card ${i.lvl}">
+      <div class="stat-label">${i.label}</div>
+      <div class="stat-value">${i.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderStatus(status){
+  const cfg = {
+    good:{label:'GOOD', desc:'All readings for this camera position look healthy.', icon:'<polyline points="20 6 9 17 4 12"/>'},
+    needs_attention:{label:'NEEDS ATTENTION', desc:'Some readings are moderate. Keep monitoring this spot.', icon:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'},
+    urgent:{label:'URGENT', desc:'Multiple low readings detected at this camera position.', icon:'<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'},
+  }[status];
+
+  document.getElementById('status-banner').innerHTML = `
+    <div class="status-banner ${status}">
+      <div class="status-icon ${status}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${cfg.icon}</svg></div>
+      <div>
+        <div class="status-label ${status}">${cfg.label}</div>
+        <div class="status-desc">${cfg.desc}</div>
+      </div>
+    </div>`;
+}
+
+function updateReadings(){
+  const status = pickPositionStatus();
+  const soil = generateSoil(status);
+  const crop = generateCrop(status);
+  renderGrid(document.getElementById('soil-grid'), soil);
+  renderGrid(document.getElementById('crop-grid'), crop);
+  renderStatus(status);
+
+  document.getElementById('soil-loc-sub').textContent = `Cam 1 · Facing ${COMPASS[pan]} · Tilt ${TILT_LEVELS[tilt]}`;
+  document.getElementById('crop-loc-sub').textContent = `Cam 2 · ${VCAM_LEVELS[vcam]}`;
+}
+
+function updateFeed(){
+  document.getElementById('cam1-readout').textContent = `Facing ${COMPASS[pan]} · Tilt ${TILT_LEVELS[tilt]}`;
+  document.getElementById('cam2-readout').textContent = VCAM_LEVELS[vcam];
+  document.getElementById('feed-compass').textContent = `Cam 1 · ${COMPASS[pan]} · ${TILT_LEVELS[tilt]}`;
+  document.getElementById('feed-vcam').textContent = `Cam 2 · ${VCAM_LEVELS[vcam]}`;
+  document.getElementById('feed').style.background = FEED_BG[VCAM_LEVELS[vcam]];
+  document.getElementById('feed-icon').style.transform = `rotate(${pan*45}deg) scale(${1+tilt*0.12})`;
+}
+
+function tick(){
+  document.getElementById('feed-time').textContent = new Date().toLocaleTimeString();
+}
+
+function panLeft(){ pan = (pan+7)%8; onChange(); }
+function panRight(){ pan = (pan+1)%8; onChange(); }
+function tiltUp(){ tilt = Math.min(tilt+1,2); onChange(); }
+function tiltDown(){ tilt = Math.max(tilt-1,0); onChange(); }
+function vcamUp(){ vcam = Math.min(vcam+1,2); onChange(); }
+function vcamDown(){ vcam = Math.max(vcam-1,0); onChange(); }
+
+function onChange(){
+  updateFeed();
+  updateReadings();
+}
+
+loadFarmer();
+updateFeed();
+updateReadings();
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
