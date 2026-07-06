@@ -120,6 +120,18 @@ fieldset.form-section.highlight{border:1.5px solid var(--green-200);background:v
     <p>This is a static, database-free demo. Farmer records are stored in your browser's Local Storage. Monitoring data on the Dashboard and NFC Card page is randomly generated for demonstration purposes. Every field saved here is also shown on that farmer's NFC Card page.</p>
   </div>
 
+  <!-- Weather -->
+  <div class="card" style="padding:14px 20px">
+    <div class="section-header" style="margin-bottom:8px">
+      <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg></div>
+      <div>
+        <h2 class="section-title" style="font-size:14px">Current Weather</h2>
+        <div class="section-sub">Ambod, Mansa, Gandhinagar, Gujarat</div>
+      </div>
+    </div>
+    <div id="admin-weather-body" style="font-size:13px;color:var(--gray-700)">Loading weather…</div>
+  </div>
+
   <!-- Add Farmer -->
   <div class="card">
     <div class="section-header">
@@ -381,11 +393,25 @@ fieldset.form-section.highlight{border:1.5px solid var(--green-200);background:v
 <div class="copy-toast" id="copy-toast">Link copied to clipboard</div>
 
 <script src="assets/storage.js"></script>
+<script src="assets/weather.js"></script>
 <script>
-function pageUrl(file, code){
+function pageUrl(file, param, value){
   const base = location.href.replace(/index\.html.*$/, '').replace(/\/$/, '');
-  return `${base}/${file}?code=${encodeURIComponent(code)}`;
+  return `${base}/${file}?${param}=${encodeURIComponent(value)}`;
 }
+
+async function renderAdminWeather(){
+  const el = document.getElementById('admin-weather-body');
+  try{
+    const data = await agri360FetchWeather();
+    const cur = data.current;
+    const info = agri360WeatherInfo(cur.weather_code);
+    el.innerHTML = `<span style="font-size:22px;vertical-align:middle">${info.emoji}</span> <strong style="font-family:'Lexend';font-size:16px">${Math.round(cur.temperature_2m)}°C</strong> · ${info.label} · 💧 ${cur.relative_humidity_2m}% humidity · 💨 ${Math.round(cur.wind_speed_10m)} km/h wind`;
+  }catch(e){
+    el.textContent = 'Weather data unavailable right now — check your internet connection.';
+  }
+}
+renderAdminWeather();
 
 /* ---- form helpers ---- */
 function syncOther(groupName, otherValue, inputId){
@@ -466,9 +492,9 @@ function render(){
         <button class="btn btn-danger btn-sm" onclick="removeFarmer('${f.code}')">Delete</button>
       </div>
       <div class="nfc-row" id="nfc-${f.code}">
-        <input class="nfc-url" readonly id="nfc-url-${f.code}" value="${pageUrl('agri360-mobile.html', f.code)}">
+        <input class="nfc-url" readonly id="nfc-url-${f.code}" value="${pageUrl('agri360-mobile.html', 'mitra', f.mitraCardNumber)}">
         <button class="btn btn-secondary btn-sm" onclick="copyNfc('${f.code}')">Copy</button>
-        <button class="btn btn-outline btn-sm" onclick="window.open('agri360-mobile.html?code=${encodeURIComponent(f.code)}','_blank')">Preview</button>
+        <button class="btn btn-outline btn-sm" onclick="window.open('agri360-mobile.html?mitra=${encodeURIComponent(f.mitraCardNumber)}','_blank')">Preview</button>
       </div>
     </div>
   `).join('');

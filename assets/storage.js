@@ -17,6 +17,11 @@ function agri360GetFarmerByCode(code){
   return agri360GetFarmers().find(f => f.code === code) || null;
 }
 
+function agri360GetFarmerByMitra(mitraCardNumber){
+  if(!mitraCardNumber) return null;
+  return agri360GetFarmers().find(f => f.mitraCardNumber === mitraCardNumber) || null;
+}
+
 function agri360GenerateFarmerCode(){
   const farmers = agri360GetFarmers();
   let max = 0;

@@ -51,18 +51,6 @@ h1,h2,h3,.font-heading{font-family:'Lexend',system-ui,sans-serif}
 .warn-banner svg{width:16px;height:16px;color:var(--amber-500);flex-shrink:0;margin-top:1px}
 .warn-banner p{font-size:12px;color:var(--amber-700)}
 
-/* Camera feed */
-.feed{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/10;background:linear-gradient(160deg,#0f3d1f,#1d5c33 45%,#2f7a45);display:flex;align-items:center;justify-content:center;transition:background 1s}
-.feed-overlay{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.08),transparent 60%)}
-.feed-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:32px 32px}
-.feed-rec{position:absolute;top:10px;left:12px;display:flex;align-items:center;gap:6px;color:#fff;font-size:11px;font-weight:700;letter-spacing:.5px}
-.feed-rec .dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:pulse 1.2s infinite}
-.feed-time{position:absolute;top:10px;right:12px;color:rgba(255,255,255,.85);font-size:10px;font-family:monospace}
-.feed-compass{position:absolute;bottom:10px;left:12px;color:#fff;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);padding:4px 9px;border-radius:8px}
-.feed-vcam{position:absolute;bottom:10px;right:12px;color:#fff;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);padding:4px 9px;border-radius:8px}
-.feed-icon{position:relative;z-index:2;color:rgba(255,255,255,.9);opacity:.85;transition:transform .3s}
-.feed-icon svg{width:56px;height:56px}
-
 /* PTZ controls */
 .ptz-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 .ptz-panel{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -146,28 +134,8 @@ h1,h2,h3,.font-heading{font-family:'Lexend',system-ui,sans-serif}
       </div>
     </div>
 
-    <!-- Camera feed + PTZ -->
+    <!-- PTZ Controls -->
     <div class="card">
-      <div class="section-header">
-        <div class="section-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
-        <div>
-          <h2 class="section-title">PTZ Camera Control</h2>
-          <div class="section-sub">Dual camera rig · 360° pan-tilt + 90° vertical scan</div>
-        </div>
-      </div>
-
-      <div class="feed" id="feed">
-        <div class="feed-grid"></div>
-        <div class="feed-overlay"></div>
-        <div class="feed-rec"><span class="dot"></span>REC</div>
-        <div class="feed-time" id="feed-time">--:--:--</div>
-        <div class="feed-compass" id="feed-compass">Cam 1 · N · Mid</div>
-        <div class="feed-vcam" id="feed-vcam">Cam 2 · Mid Canopy</div>
-        <div class="feed-icon" id="feed-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></svg>
-        </div>
-      </div>
-
       <div class="ptz-panels">
         <div class="ptz-panel">
           <div class="ptz-panel-title">CAMERA 1 — 360° PAN / TILT</div>
@@ -237,11 +205,6 @@ h1,h2,h3,.font-heading{font-family:'Lexend',system-ui,sans-serif}
 const COMPASS = ['N','NE','E','SE','S','SW','W','NW'];
 const TILT_LEVELS = ['Low','Mid','High'];
 const VCAM_LEVELS = ['Soil Level','Mid Canopy','Canopy Top'];
-const FEED_BG = {
-  'Soil Level':'linear-gradient(160deg,#3b2a1a,#5c4326 45%,#7a5c33)',
-  'Mid Canopy':'linear-gradient(160deg,#0f3d1f,#1d5c33 45%,#2f7a45)',
-  'Canopy Top':'linear-gradient(160deg,#173d0f,#3a7a1d 45%,#6bbf3a)',
-};
 
 let pan = 0, tilt = 1, vcam = 1;
 
@@ -373,14 +336,6 @@ function updateReadings(){
 function updateFeed(){
   document.getElementById('cam1-readout').textContent = `Facing ${COMPASS[pan]} · Tilt ${TILT_LEVELS[tilt]}`;
   document.getElementById('cam2-readout').textContent = VCAM_LEVELS[vcam];
-  document.getElementById('feed-compass').textContent = `Cam 1 · ${COMPASS[pan]} · ${TILT_LEVELS[tilt]}`;
-  document.getElementById('feed-vcam').textContent = `Cam 2 · ${VCAM_LEVELS[vcam]}`;
-  document.getElementById('feed').style.background = FEED_BG[VCAM_LEVELS[vcam]];
-  document.getElementById('feed-icon').style.transform = `rotate(${pan*45}deg) scale(${1+tilt*0.12})`;
-}
-
-function tick(){
-  document.getElementById('feed-time').textContent = new Date().toLocaleTimeString();
 }
 
 function panLeft(){ pan = (pan+7)%8; onChange(); }
@@ -398,8 +353,6 @@ function onChange(){
 loadFarmer();
 updateFeed();
 updateReadings();
-tick();
-setInterval(tick, 1000);
 </script>
 </body>
 </html>
