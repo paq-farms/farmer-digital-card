@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Agri360 — Farmer Digital Card</title>
+<title>Eagle Eye: Farm Intelligence System — Farmer Card</title>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -22,7 +22,18 @@ body{background:linear-gradient(135deg,var(--green-50),#fff,#fffbf0);min-height:
 h1,h2,h3,h4,h5,h6,.font-heading{font-family:'Lexend',system-ui,sans-serif}
 
 /* Header */
-.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.header{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--gray-100);display:flex;flex-direction:column}
+.header-main{padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.header-sub{padding:0 16px;height:36px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--gray-100);background:var(--gray-50)}
+.header-elements{display:flex;align-items:center;gap:14px}
+.header-elements .el{display:flex;align-items:center;gap:5px}
+.header-elements img{width:17px;height:17px}
+.header-elements span{font-size:10px;font-weight:600;color:var(--gray-500);white-space:nowrap;display:none}
+@media(min-width:560px){.header-elements span{display:inline}}
+.header-logos{display:flex;align-items:center;gap:16px}
+.header-logos img{height:17px;width:auto;opacity:.85}
+.header-logos img.logo-paq{height:16px}
+.header-logos img.logo-sanf{height:18px}
 .header-brand{display:flex;align-items:center;gap:8px}
 .header-icon{width:32px;height:32px;border-radius:12px;background:var(--green-700);display:flex;align-items:center;justify-content:center}
 .header-icon svg{width:18px;height:18px;color:#fff}
@@ -209,16 +220,29 @@ h1,h2,h3,h4,h5,h6,.font-heading{font-family:'Lexend',system-ui,sans-serif}
 
 <!-- Header -->
 <header class="header">
-  <div class="header-brand">
-    <div class="header-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8c-2 0-4 2-4 4s2 4 4 4"/><path d="M12 6V4m0 16v-2"/></svg>
+  <div class="header-main">
+    <div class="header-brand">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/><path d="M12 8c-2 0-4 2-4 4s2 4 4 4"/><path d="M12 6V4m0 16v-2"/></svg>
+      </div>
+      <span class="header-title">Eagle Eye</span>
+      <span class="header-tagline">Farm Intelligence System</span>
     </div>
-    <span class="header-title">Agri360</span>
-    <span class="header-tagline">Smart Farming, Better Tomorrow</span>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en')">English</button>
+      <button class="lang-btn" onclick="setLang('gu')">ગુજરાતી</button>
+    </div>
   </div>
-  <div class="lang-toggle">
-    <button class="lang-btn active" onclick="setLang('en')">English</button>
-    <button class="lang-btn" onclick="setLang('gu')">ગુજરાતી</button>
+  <div class="header-sub">
+    <div class="header-elements">
+      <div class="el"><img src="assets/logos/bees.svg" alt="Bees"><span>Bees</span></div>
+      <div class="el"><img src="assets/logos/tech.svg" alt="Technology"><span>Technology</span></div>
+      <div class="el"><img src="assets/logos/community.svg" alt="Community"><span>Community</span></div>
+    </div>
+    <div class="header-logos">
+      <img src="assets/logos/paq-logo.png" alt="PAQ — Project Adopt a Queen" class="logo-paq">
+      <img src="assets/logos/sanf-logo.png" alt="Sahastitva Nature Foundation" class="logo-sanf">
+    </div>
   </div>
 </header>
 
@@ -840,7 +864,7 @@ function setLang(l){
   renderClusters();
   renderFarmStatus();
   // Update header tagline
-  document.querySelector('.header-tagline').textContent = l==='gu' ? 'સ્માર્ટ ખેતી, બહેતર આવતીકાલ' : 'Smart Farming, Better Tomorrow';
+  document.querySelector('.header-tagline').textContent = l==='gu' ? 'ફાર્મ ઇન્ટેલિજન્સ સિસ્ટમ' : 'Farm Intelligence System';
 }
 
 async function renderWeather(){
