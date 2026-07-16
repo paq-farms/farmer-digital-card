@@ -392,6 +392,15 @@ let ALERTS = {};
 const REFRESH_INTERVAL_MS = 3 * 60 * 60 * 1000; // 3 hours
 let lastUpdateTs = Date.now();
 let openClusterN = null;
+let wheelClockInterval = null;
+
+function formatRealtime(){
+  const now = new Date();
+  const locale = lang==='gu' ? 'gu-IN' : 'en-IN';
+  const dateStr = now.toLocaleDateString(locale, { day:'2-digit', month:'short', year:'numeric' });
+  const timeStr = now.toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+  return `${dateStr}, ${timeStr}`;
+}
 
 function randRange(min, max, decimals){
   const v = Math.random() * (max - min) + min;
@@ -508,7 +517,7 @@ const T = {
     needsAttentionGuide:'Some issues found. Monitor and take action.', urgentGuide:'Immediate action required.',
     yourFarm:'YOUR FARM', keepMonitoring:'Keep monitoring this cluster regularly.',
     clusterDetails:'Cluster {n} Details', direction:'{dir} Direction',
-    soilHealthReport:'SOIL HEALTH REPORT', fieldCluster:'Field Cluster', testDate:'Test Date: 15 May 2024',
+    soilHealthReport:'SOIL HEALTH REPORT', fieldCluster:'Field Cluster', testDate:'Updated:',
     action:'Action:', recommendedActions:'Recommended Actions',
     high:'HIGH', medium:'MEDIUM', low:'LOW',
     goodLevel:'Good Level (> 60%)', moderateLevel:'Moderate Level (30% - 60%)', lowLevel:'Low Level (< 30%)',
@@ -524,7 +533,7 @@ const T = {
     needsAttentionGuide:'કેટલીક સમસ્યાઓ મળી. નિરીક્ષણ કરો અને પગલાં લો.', urgentGuide:'તાત્કાલિક પગલાં જરૂરી.',
     yourFarm:'તમારું ખેતર', keepMonitoring:'આ ક્લસ્ટરનું નિયમિત નિરીક્ષણ કરતા રહો.',
     clusterDetails:'ક્લસ્ટર {n} વિગતો', direction:'{dir} દિશા',
-    soilHealthReport:'જમીન આરોગ્ય અહેવાલ', fieldCluster:'ફીલ્ડ ક્લસ્ટર', testDate:'ટેસ્ટ તારીખ: 15 May 2024',
+    soilHealthReport:'જમીન આરોગ્ય અહેવાલ', fieldCluster:'ફીલ્ડ ક્લસ્ટર', testDate:'અપડેટ:',
     action:'પગલું:', recommendedActions:'ભલામણ કરેલ પગલાં',
     high:'HIGH', medium:'MEDIUM', low:'LOW',
     goodLevel:'સારું સ્તર (> 60%)', moderateLevel:'મધ્યમ સ્તર (30% - 60%)', lowLevel:'ઓછું સ્તર (< 30%)',
@@ -606,7 +615,7 @@ function buildWheel(cl){
   // Center text
   svg += `<text x="${cx}" y="${cy-16}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#15803d" letter-spacing="0.6" font-family="Lexend,sans-serif">${t('soilHealthReport')}</text>`;
   svg += `<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#166534" font-family="Lexend,sans-serif">${t('fieldCluster')} - ${cl.n}</text>`;
-  svg += `<text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Source Sans 3,sans-serif">${t('testDate')}</text>`;
+  svg += `<text id="wheel-datetime" x="${cx}" y="${cy+18}" text-anchor="middle" font-size="8" fill="#6b7280" font-family="Source Sans 3,sans-serif">${t('testDate')} ${formatRealtime()}</text>`;
 
   svg += `</svg>`;
   return svg;
@@ -674,12 +683,19 @@ function openCluster(n){
 
   document.getElementById('modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  if(wheelClockInterval) clearInterval(wheelClockInterval);
+  wheelClockInterval = setInterval(()=>{
+    const el = document.getElementById('wheel-datetime');
+    if(el) el.textContent = `${t('testDate')} ${formatRealtime()}`;
+  }, 1000);
 }
 
 function closeModal(){
   document.getElementById('modal').classList.remove('open');
   document.body.style.overflow = '';
   openClusterN = null;
+  if(wheelClockInterval){ clearInterval(wheelClockInterval); wheelClockInterval = null; }
 }
 
 function renderFarmStatus(){
